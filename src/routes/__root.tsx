@@ -11,6 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Navbar } from "@/components/amphis/Navbar";
+import { Footer } from "@/components/amphis/Footer";
+import { WalletProvider } from "@/lib/solana/WalletContext";
 
 function NotFoundComponent() {
   return (
@@ -77,14 +80,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Amphis — Your trading reputation." },
+      {
+        name: "description",
+        content: "Turn your real Solana trading activity into a reputation you can prove.",
+      },
+      { name: "author", content: "Amphis" },
+      { property: "og:title", content: "Amphis — Your trading reputation." },
+      {
+        property: "og:description",
+        content: "Turn your real Solana trading activity into a reputation you can prove.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@amphisfi" },
     ],
     links: [
       {
@@ -119,8 +128,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <WalletProvider>
+        <div className="flex min-h-screen flex-col">
+          <Navbar />
+          <main className="flex-1">
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
+      </WalletProvider>
     </QueryClientProvider>
   );
 }

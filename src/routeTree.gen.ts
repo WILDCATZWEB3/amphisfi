@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as MeRouteImport } from './routes/me'
+import { Route as TraderWalletAddressRouteImport } from './routes/trader.$walletAddress'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeRoute = MeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TraderWalletAddressRoute = TraderWalletAddressRouteImport.update({
+  id: '/trader/$walletAddress',
+  path: '/trader/$walletAddress',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/me': typeof MeRoute
+  '/trader/$walletAddress': typeof TraderWalletAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/me': typeof MeRoute
+  '/trader/$walletAddress': typeof TraderWalletAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/me': typeof MeRoute
+  '/trader/$walletAddress': typeof TraderWalletAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/explore' | '/leaderboard' | '/me' | '/trader/$walletAddress'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/explore' | '/leaderboard' | '/me' | '/trader/$walletAddress'
+  id:
+    | '__root__'
+    | '/'
+    | '/explore'
+    | '/leaderboard'
+    | '/me'
+    | '/trader/$walletAddress'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExploreRoute: typeof ExploreRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  MeRoute: typeof MeRoute
+  TraderWalletAddressRoute: typeof TraderWalletAddressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/me': {
+      id: '/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trader/$walletAddress': {
+      id: '/trader/$walletAddress'
+      path: '/trader/$walletAddress'
+      fullPath: '/trader/$walletAddress'
+      preLoaderRoute: typeof TraderWalletAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExploreRoute: ExploreRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  MeRoute: MeRoute,
+  TraderWalletAddressRoute: TraderWalletAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
