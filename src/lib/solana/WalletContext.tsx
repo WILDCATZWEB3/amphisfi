@@ -25,6 +25,7 @@ type WalletState = {
   installed: WalletId[];
   connect: (id: WalletId) => Promise<void>;
   disconnect: () => Promise<void>;
+  signMessage: (message: string) => Promise<Uint8Array>;
   clearError: () => void;
 };
 
@@ -133,6 +134,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     window.localStorage.removeItem(STORAGE_KEY);
   }, [walletId]);
 
+  const signMessage = useCallback(
+    async (message: string): Promise<Uint8Array> => {
+      const provider = walletId ? getProvider(walletId) : null;
+      if (!provider?.signMessage) throw new Error("This wallet does not support message signing.");
+      try {
+        const res = await provider.signMessage(new TextEncoder().encode(message), "utf8");
+        return res instanceof Uint8Array ? res : res.signature;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Signing failed.";
+        throw new Error(/user rejected|4001/i.test(msg) ? "Signature request rejected." : msg);
+      }
+    },
+    [walletId],
+  );
+
   const value = useMemo<WalletState>(
     () => ({
       address,
@@ -142,9 +158,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       installed,
       connect,
       disconnect,
+      signMessage,
       clearError: () => setError(null),
     }),
-    [address, walletId, connecting, error, installed, connect, disconnect],
+    [address, walletId, connecting, error, installed, connect, disconnect, signMessage],
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
