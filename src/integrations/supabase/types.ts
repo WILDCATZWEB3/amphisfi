@@ -21,8 +21,9 @@ export type Database = {
           created_at: string
           id: string
           updated_at: string
+          user_id: string | null
           username: string | null
-          wallet_address: string
+          wallet_address: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -30,8 +31,9 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
+          user_id?: string | null
           username?: string | null
-          wallet_address: string
+          wallet_address?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -39,8 +41,9 @@ export type Database = {
           created_at?: string
           id?: string
           updated_at?: string
+          user_id?: string | null
           username?: string | null
-          wallet_address?: string
+          wallet_address?: string | null
         }
         Relationships: []
       }
@@ -90,7 +93,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_username: { Args: { _u: string }; Returns: string }
+      is_reserved_username: { Args: { _u: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
