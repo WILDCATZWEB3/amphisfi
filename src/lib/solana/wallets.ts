@@ -15,6 +15,11 @@ export type SolanaProvider = {
     publicKey?: { toString(): string };
   } | void>;
   disconnect: () => Promise<void>;
+  /** Off-chain message signing only — used once to prove wallet ownership. */
+  signMessage?: (
+    message: Uint8Array,
+    encoding?: string,
+  ) => Promise<{ signature: Uint8Array } | Uint8Array>;
   on?: (event: string, handler: (...args: unknown[]) => void) => void;
   off?: (event: string, handler: (...args: unknown[]) => void) => void;
   removeListener?: (event: string, handler: (...args: unknown[]) => void) => void;
