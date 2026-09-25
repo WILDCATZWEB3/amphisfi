@@ -40,7 +40,7 @@ function MyProfilePage() {
 
   return (
     <div className="container-page py-12 sm:py-16">
-      <PageHeader title="My Profile" description={user.email ?? undefined} />
+      <PageHeader title="My Profile" description={user.email ?? ""} />
       <div className="mt-8 flex items-center gap-4">
         <Avatar path={p?.avatar_url} size={72} />
         <div className="min-w-0">

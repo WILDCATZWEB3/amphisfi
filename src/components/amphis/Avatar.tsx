@@ -8,8 +8,8 @@ export function Avatar({
   size = 64,
   className,
 }: {
-  path?: string | null;
-  src?: string | null;
+  path?: string | null | undefined;
+  src?: string | null | undefined;
   size?: number;
   className?: string;
 }) {
