@@ -2,7 +2,26 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
+import { Avatar } from "./Avatar";
 import { WalletButton } from "./WalletButton";
+import { useMyProfile, useSession } from "@/lib/account";
+
+function AccountButton() {
+  const { user, ready } = useSession();
+  const { data: p } = useMyProfile(user?.id);
+  if (!ready) return null;
+  if (!user)
+    return (
+      <Link to="/auth" className="rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary">
+        Sign in
+      </Link>
+    );
+  return (
+    <Link to="/me" aria-label="My profile">
+      <Avatar path={p?.avatar_url} size={32} />
+    </Link>
+  );
+}
 
 const links = [
   { to: "/explore", label: "Explore" },
@@ -36,6 +55,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <WalletButton />
+          <AccountButton />
           <button
             type="button"
             aria-label="Toggle menu"

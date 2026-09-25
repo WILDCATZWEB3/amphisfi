@@ -14,9 +14,10 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
-import { Route as MeRouteImport } from './routes/me'
+import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as TraderWalletAddressRouteImport } from './routes/trader.$walletAddress'
+import { Route as UUsernameRouteImport } from './routes/u.$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,10 +43,10 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MeRoute = MeRouteImport.update({
+const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
   id: '/me',
   path: '/me',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
@@ -57,24 +58,31 @@ const TraderWalletAddressRoute = TraderWalletAddressRouteImport.update({
   path: '/trader/$walletAddress',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UUsernameRoute = UUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
-  '/me': typeof MeRoute
+  '/me': typeof AuthenticatedMeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
+  '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
-  '/me': typeof MeRoute
+  '/me': typeof AuthenticatedMeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
+  '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -83,9 +91,10 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
-  '/me': typeof MeRoute
+  '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
+  '/u/$username': typeof UUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/me'
     | '/onboarding'
     | '/trader/$walletAddress'
+    | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/me'
     | '/onboarding'
     | '/trader/$walletAddress'
+    | '/u/$username'
   id:
     | '__root__'
     | '/'
@@ -113,9 +124,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explore'
     | '/leaderboard'
-    | '/me'
+    | '/_authenticated/me'
     | '/_authenticated/onboarding'
     | '/trader/$walletAddress'
+    | '/u/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -124,8 +136,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
   LeaderboardRoute: typeof LeaderboardRoute
-  MeRoute: typeof MeRoute
   TraderWalletAddressRoute: typeof TraderWalletAddressRoute
+  UUsernameRoute: typeof UUsernameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -165,12 +177,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/me': {
-      id: '/me'
+    '/_authenticated/me': {
+      id: '/_authenticated/me'
       path: '/me'
       fullPath: '/me'
-      preLoaderRoute: typeof MeRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedMeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
@@ -186,14 +198,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TraderWalletAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
@@ -206,8 +227,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
   LeaderboardRoute: LeaderboardRoute,
-  MeRoute: MeRoute,
   TraderWalletAddressRoute: TraderWalletAddressRoute,
+  UUsernameRoute: UUsernameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

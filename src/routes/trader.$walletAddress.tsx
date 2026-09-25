@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
+import { Avatar } from "@/components/amphis/Avatar";
 import { Card, CardHeader } from "@/components/amphis/Card";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
@@ -43,7 +44,7 @@ function TraderProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("username, bio, created_at")
+        .select("username, bio, avatar_url, created_at")
         .eq("wallet_address", walletAddress)
         .maybeSingle();
       if (error) throw error;
@@ -84,9 +85,11 @@ function TraderProfile() {
             />
           ) : profileQuery.data ? (
             <div className="space-y-3">
-              <div>
-                <p className="text-xs text-muted-foreground">Username</p>
-                <p className="text-sm">{profileQuery.data.username ?? "Not set"}</p>
+              <div className="flex items-center gap-3">
+                <Avatar path={profileQuery.data.avatar_url} size={48} />
+                <p className="text-sm font-medium">
+                  {profileQuery.data.username ? `@${profileQuery.data.username}` : "Not set"}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Bio</p>
