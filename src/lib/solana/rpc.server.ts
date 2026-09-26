@@ -85,7 +85,7 @@ export type SignatureInfo = {
 
 export function getSignaturesForAddress(
   address: string,
-  opts: { before?: string; until?: string; limit?: number },
+  opts: { before?: string | undefined; until?: string | undefined; limit?: number },
 ): Promise<SignatureInfo[]> {
   const cfg: Record<string, unknown> = { limit: Math.min(opts.limit ?? 100, 1000), commitment: "finalized" };
   if (opts.before) cfg["before"] = opts.before;
