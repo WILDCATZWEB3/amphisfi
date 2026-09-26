@@ -12,7 +12,7 @@ function AccountButton() {
   if (!ready) return null;
   if (!user)
     return (
-      <Link to="/auth" className="rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary">
+      <Link to="/auth" className="whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary">
         Sign in
       </Link>
     );
