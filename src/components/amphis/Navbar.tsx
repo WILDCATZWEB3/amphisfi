@@ -12,7 +12,7 @@ function AccountButton() {
   if (!ready) return null;
   if (!user)
     return (
-      <Link to="/auth" className="whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary">
+      <Link to="/auth" className="hidden whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary min-[400px]:inline-block">
         Sign in
       </Link>
     );
@@ -31,11 +31,12 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { user, ready } = useSession();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+      <div className="container-page flex h-16 items-center justify-between gap-2 sm:gap-4">
+        <Link to="/" className="flex shrink-0 items-center gap-2" onClick={() => setOpen(false)}>
           <span className="h-4 w-4 rounded-sm border border-accent bg-accent/20" aria-hidden />
           <span className="text-base font-semibold tracking-tight">Amphis</span>
         </Link>
@@ -53,14 +54,14 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
           <WalletButton />
           <AccountButton />
           <button
             type="button"
             aria-label="Toggle menu"
             onClick={() => setOpen((v) => !v)}
-            className="rounded-md border border-border p-2 text-muted-foreground md:hidden"
+            className="shrink-0 rounded-md border border-border p-2 text-muted-foreground md:hidden"
           >
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -81,6 +82,11 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
+            {ready && !user ? (
+              <Link to="/auth" onClick={() => setOpen(false)} className="py-3 text-sm text-foreground">
+                Sign in
+              </Link>
+            ) : null}
           </div>
         </nav>
       ) : null}
