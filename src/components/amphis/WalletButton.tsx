@@ -32,7 +32,9 @@ export function WalletButton({ className }: { className?: string }) {
         disabled={connecting}
       >
         <span className={address ? "font-mono" : undefined}>
-          {connecting ? "Connecting" : address ? shortenAddress(address) : "Connect Wallet"}
+          {connecting ? "Connecting" : address ? shortenAddress(address) : (
+            <>Connect<span className="hidden min-[380px]:inline"> Wallet</span></>
+          )}
         </span>
         <ChevronDown className="h-3.5 w-3.5 opacity-60" />
       </Button>
