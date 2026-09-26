@@ -47,34 +47,213 @@ export type Database = {
         }
         Relationships: []
       }
+      token_assets: {
+        Row: {
+          created_at: string
+          decimals: number | null
+          logo_url: string | null
+          mint: string
+          name: string | null
+          symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decimals?: number | null
+          logo_url?: string | null
+          mint: string
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decimals?: number | null
+          logo_url?: string | null
+          mint?: string
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          block_time: string | null
+          confidence: string
+          created_at: string
+          id: string
+          input_amount: number
+          input_decimals: number
+          input_mint: string
+          output_amount: number
+          output_decimals: number
+          output_mint: string
+          signature: string
+          source: string | null
+          transaction_id: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          block_time?: string | null
+          confidence: string
+          created_at?: string
+          id?: string
+          input_amount: number
+          input_decimals: number
+          input_mint: string
+          output_amount: number
+          output_decimals: number
+          output_mint: string
+          signature: string
+          source?: string | null
+          transaction_id: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          block_time?: string | null
+          confidence?: string
+          created_at?: string
+          id?: string
+          input_amount?: number
+          input_decimals?: number
+          input_mint?: string
+          output_amount?: number
+          output_decimals?: number
+          output_mint?: string
+          signature?: string
+          source?: string | null
+          transaction_id?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: true
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trades_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          block_time: string | null
+          created_at: string
+          fee_lamports: number | null
+          id: string
+          parsed_type: string
+          programs: string[]
+          raw_transaction_reference: string | null
+          signature: string
+          slot: number
+          source: string | null
+          status: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          block_time?: string | null
+          created_at?: string
+          fee_lamports?: number | null
+          id?: string
+          parsed_type?: string
+          programs?: string[]
+          raw_transaction_reference?: string | null
+          signature: string
+          slot: number
+          source?: string | null
+          status: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          block_time?: string | null
+          created_at?: string
+          fee_lamports?: number | null
+          id?: string
+          parsed_type?: string
+          programs?: string[]
+          raw_transaction_reference?: string | null
+          signature?: string
+          slot?: number
+          source?: string | null
+          status?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallets: {
         Row: {
           address: string
+          backfill_complete: boolean
           created_at: string
           first_seen_at: string
           id: string
+          last_signature: string | null
           last_synced_at: string | null
+          newest_block_time: string | null
+          newest_signature: string | null
+          oldest_block_time: string | null
+          oldest_signature: string | null
           profile_id: string
+          sync_error: string | null
+          sync_started_at: string | null
           sync_status: string
           updated_at: string
         }
         Insert: {
           address: string
+          backfill_complete?: boolean
           created_at?: string
           first_seen_at?: string
           id?: string
+          last_signature?: string | null
           last_synced_at?: string | null
+          newest_block_time?: string | null
+          newest_signature?: string | null
+          oldest_block_time?: string | null
+          oldest_signature?: string | null
           profile_id: string
+          sync_error?: string | null
+          sync_started_at?: string | null
           sync_status?: string
           updated_at?: string
         }
         Update: {
           address?: string
+          backfill_complete?: boolean
           created_at?: string
           first_seen_at?: string
           id?: string
+          last_signature?: string | null
           last_synced_at?: string | null
+          newest_block_time?: string | null
+          newest_signature?: string | null
+          oldest_block_time?: string | null
+          oldest_signature?: string | null
           profile_id?: string
+          sync_error?: string | null
+          sync_started_at?: string | null
           sync_status?: string
           updated_at?: string
         }

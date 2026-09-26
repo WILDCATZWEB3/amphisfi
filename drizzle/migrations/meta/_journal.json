@@ -15,6 +15,13 @@
       "when": 1790188524464,
       "tag": "0001_account_onboarding",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790452229376,
+      "tag": "0002_wallet_transaction_sync",
+      "breakpoints": true
     }
   ]
 }
