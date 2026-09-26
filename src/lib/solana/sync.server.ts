@@ -102,8 +102,8 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
         const { error: tErr } = await db.from("trades").upsert(
           {
             wallet_id: walletId, transaction_id: row.id, signature: s.signature, block_time: iso(tx.blockTime),
-            input_mint: n.swap.inputMint, input_amount: n.swap.inputAmount, input_decimals: n.swap.inputDecimals,
-            output_mint: n.swap.outputMint, output_amount: n.swap.outputAmount, output_decimals: n.swap.outputDecimals,
+            input_mint: n.swap.inputMint, input_amount: n.swap.inputAmount as unknown as number, input_decimals: n.swap.inputDecimals,
+            output_mint: n.swap.outputMint, output_amount: n.swap.outputAmount as unknown as number, output_decimals: n.swap.outputDecimals,
             source: n.swap.source, confidence: n.swap.confidence,
           },
           { onConflict: "transaction_id", ignoreDuplicates: true },
@@ -144,7 +144,7 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
     patch["backfill_complete"] = backfillDone;
     const done = backfillDone && (mode === "backfill" || sigs.length < BATCH);
     patch["sync_status"] = done ? "completed" : "partial";
-    await db.from("wallets").update(patch).eq("id", walletId);
+    await db.from("wallets").update(patch as never).eq("id", walletId);
 
     log(done ? "sync completed" : "sync progress", { walletId, mode, processed: sigs.length, inserted, swaps });
     return { status: done ? "completed" : "partial", processed: sigs.length, inserted, swaps };
