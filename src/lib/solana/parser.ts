@@ -1,11 +1,18 @@
 /**
  * Transaction normalization. Pure functions — no network, no database.
- * Classifies from actual balance changes; never guesses. Anything ambiguous
- * stays "unknown" and no swap is produced.
+ * Classifies from the wallet's actual net balance changes; never guesses.
+ * Routed swaps (e.g. SOL > USDC > TOKEN via Jupiter) collapse naturally into
+ * one net exchange because intermediate hops net to zero for the wallet.
+ * Anything ambiguous stays unclassified and no trade is produced.
  */
 import type { ParsedTx } from "./rpc.server";
+import { detectProtocol, QUOTE_MINTS, SOL_MINT } from "./protocols";
 
-export const SOL_MINT = "So11111111111111111111111111111111111111112";
+export { SOL_MINT };
+
+/** Bump whenever classification logic changes; older rows get reprocessed. */
+export const PARSER_VERSION = 2;
+
 const SYSTEM = "11111111111111111111111111111111";
 const STAKE = "Stake11111111111111111111111111111111111111";
 const COMPUTE = "ComputeBudget111111111111111111111111111111";
@@ -15,28 +22,17 @@ const ATA = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 const MEMO = ["MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr", "Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo"];
 const INFRA = new Set([SYSTEM, COMPUTE, TOKEN, TOKEN22, ATA, ...MEMO]);
 
-/** Known DEX / aggregator programs — used only to name the source and raise confidence. */
-export const DEX_PROGRAMS: Record<string, string> = {
-  JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4: "Jupiter",
-  JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB: "Jupiter",
-  "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8": "Raydium",
-  CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK: "Raydium CLMM",
-  CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C: "Raydium CPMM",
-  whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc: "Orca",
-  "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P": "Pump.fun",
-  pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA: "PumpSwap",
-  LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo: "Meteora DLMM",
-  "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB": "Meteora",
-  PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY: "Phoenix",
-};
-
 export type ParsedType =
   | "swap" | "transfer" | "token_transfer" | "sol_transfer" | "nft" | "staking" | "program_interaction" | "unknown";
+
+export type Direction = "buy" | "sell" | "swap" | "unknown";
+export type Confidence = "high" | "medium" | "low";
 
 export type NormalizedSwap = {
   inputMint: string; inputAmount: string; inputDecimals: number;
   outputMint: string; outputAmount: string; outputDecimals: number;
-  source: string | null; confidence: "high" | "medium";
+  source: string | null; protocol: string | null;
+  direction: Direction; confidence: Confidence;
 };
 
 export type Normalized = {
@@ -52,13 +48,21 @@ export type Normalized = {
 // Ignore SOL moves below this when tokens also changed (rent for token accounts, tips).
 const SOL_DUST = 10_000_000n; // 0.01 SOL
 
+export function directionOf(inputMint: string, outputMint: string): Direction {
+  const inQ = QUOTE_MINTS.has(inputMint);
+  const outQ = QUOTE_MINTS.has(outputMint);
+  if (inQ && !outQ) return "buy";
+  if (!inQ && outQ) return "sell";
+  return "swap";
+}
+
 export function normalizeTransaction(tx: ParsedTx, wallet: string): Normalized {
   const meta = tx.meta;
   const keys = tx.transaction.message.accountKeys.map((k) => k.pubkey);
   const outer = tx.transaction.message.instructions;
   const inner = (meta?.innerInstructions ?? []).flatMap((i) => i.instructions);
   const programs = [...new Set([...outer, ...inner].map((i) => i.programId))];
-  const dex = programs.map((p) => DEX_PROGRAMS[p]).find(Boolean) ?? null;
+  const proto = detectProtocol(programs);
   const nonInfra = programs.filter((p) => !INFRA.has(p));
 
   const base: Normalized = {
@@ -66,7 +70,7 @@ export function normalizeTransaction(tx: ParsedTx, wallet: string): Normalized {
     feeLamports: meta?.fee ?? null,
     parsedType: "unknown",
     programs,
-    source: dex,
+    source: proto?.source ?? null,
     swap: null,
     mints: [],
   };
@@ -83,7 +87,7 @@ export function normalizeTransaction(tx: ParsedTx, wallet: string): Normalized {
   for (const b of meta.postTokenBalances ?? []) if (b.owner === wallet) add(b.mint, BigInt(b.uiTokenAmount.amount), b.uiTokenAmount.decimals);
   base.mints = [...deltas.entries()].map(([mint, v]) => ({ mint, decimals: v.decimals }));
 
-  // Native SOL delta, excluding the fee when the wallet paid it.
+  // Native SOL delta; the network fee is added back so fees stay separate from trade amounts.
   const idx = keys.indexOf(wallet);
   let solDelta = 0n;
   if (idx >= 0 && meta.preBalances[idx] !== undefined && meta.postBalances[idx] !== undefined) {
@@ -92,16 +96,18 @@ export function normalizeTransaction(tx: ParsedTx, wallet: string): Normalized {
   }
 
   if (base.status === "failed") return base;
-
   if (programs.includes(STAKE)) return { ...base, parsedType: "staking" };
 
   // Merge native SOL into wrapped SOL for exchange detection.
   const assets = new Map<string, { delta: bigint; decimals: number }>();
   for (const [m, v] of deltas) if (v.delta !== 0n) assets.set(m, { ...v });
   const tokenMoves = assets.size > 0;
+  const hadWsol = assets.has(SOL_MINT);
+  let mergedNative = false;
   if (solDelta !== 0n && (!tokenMoves || solDelta > SOL_DUST || solDelta < -SOL_DUST)) {
     const w = assets.get(SOL_MINT) ?? { delta: 0n, decimals: 9 };
     w.delta += solDelta;
+    mergedNative = true;
     if (w.delta === 0n) assets.delete(SOL_MINT);
     else assets.set(SOL_MINT, w);
   }
@@ -109,24 +115,28 @@ export function normalizeTransaction(tx: ParsedTx, wallet: string): Normalized {
   const outs = [...assets.entries()].filter(([, v]) => v.delta < 0n);
   const ins = [...assets.entries()].filter(([, v]) => v.delta > 0n);
 
-  // Swap: exactly one asset left the wallet and exactly one different asset arrived.
+  // Trade: exactly one asset net-left the wallet and exactly one different asset net-arrived,
+  // and some non-infrastructure program executed (plain transfers never qualify).
   if (outs.length === 1 && ins.length === 1 && nonInfra.length > 0) {
     const [inMint, inV] = outs[0]!;
     const [outMint, outV] = ins[0]!;
-    const nft = (inV.decimals === 0) || (outV.decimals === 0);
-    if (nft) return { ...base, parsedType: "nft" };
+    if (inV.decimals === 0 || outV.decimals === 0) return { ...base, parsedType: "nft" };
+    // high: verified DEX program; medium: verified DEX but native+wrapped SOL both moved
+    // (rent/wrapping noise may be folded in); low: unrecognized program — not treated as verified.
+    const confidence: Confidence = !proto ? "low" : mergedNative && hadWsol ? "medium" : "high";
     return {
       ...base,
       parsedType: "swap",
       swap: {
         inputMint: inMint, inputAmount: (-inV.delta).toString(), inputDecimals: inV.decimals,
         outputMint: outMint, outputAmount: outV.delta.toString(), outputDecimals: outV.decimals,
-        source: dex, confidence: dex ? "high" : "medium",
+        source: proto?.source ?? null, protocol: proto?.protocol ?? null,
+        direction: directionOf(inMint, outMint), confidence,
       },
     };
   }
   if (outs.length > 1 || ins.length > 1 || (outs.length === 1 && ins.length === 1)) {
-    // Several assets moved (or exchange without a program) — ambiguous, do not guess.
+    // Several assets moved (or exchange without any program) — ambiguous, do not guess.
     return { ...base, parsedType: nonInfra.length > 0 ? "program_interaction" : "unknown" };
   }
 
