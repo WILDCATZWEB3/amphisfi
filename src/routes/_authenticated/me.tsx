@@ -9,6 +9,7 @@ import { inputCls, ProfileEditor, WalletLinker } from "@/components/amphis/Profi
 import { ErrorState, LoadingState } from "@/components/amphis/States";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyProfile } from "@/lib/account";
+import { WalletActivity } from "@/components/amphis/WalletActivity";
 
 export const Route = createFileRoute("/_authenticated/me")({
   head: () => ({
@@ -63,7 +64,10 @@ function MyProfilePage() {
           <Card>
             <CardHeader title="Wallet" />
             {p ? (
-              <WalletLinker userId={user.id} linked={p.wallet_address} />
+              <>
+                <WalletLinker userId={user.id} linked={p.wallet_address} />
+                {p.wallet_address ? <WalletActivity profileId={p.id} /> : null}
+              </>
             ) : (
               <p className="text-sm text-muted-foreground">Save a username first.</p>
             )}

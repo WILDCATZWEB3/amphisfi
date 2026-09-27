@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Trade classification lives in src/lib/solana/parser.ts; bump PARSER_VERSION on logic changes so reprocessWalletBatch re-parses older rows. Why: parser improves over time without re-linking wallets.

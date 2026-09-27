@@ -82,6 +82,8 @@ export type Database = {
           block_time: string | null
           confidence: string
           created_at: string
+          direction: string
+          fee_lamports: number | null
           id: string
           input_amount: number
           input_decimals: number
@@ -89,6 +91,8 @@ export type Database = {
           output_amount: number
           output_decimals: number
           output_mint: string
+          parser_version: number
+          protocol: string | null
           signature: string
           source: string | null
           transaction_id: string
@@ -99,6 +103,8 @@ export type Database = {
           block_time?: string | null
           confidence: string
           created_at?: string
+          direction?: string
+          fee_lamports?: number | null
           id?: string
           input_amount: number
           input_decimals: number
@@ -106,6 +112,8 @@ export type Database = {
           output_amount: number
           output_decimals: number
           output_mint: string
+          parser_version?: number
+          protocol?: string | null
           signature: string
           source?: string | null
           transaction_id: string
@@ -116,6 +124,8 @@ export type Database = {
           block_time?: string | null
           confidence?: string
           created_at?: string
+          direction?: string
+          fee_lamports?: number | null
           id?: string
           input_amount?: number
           input_decimals?: number
@@ -123,6 +133,8 @@ export type Database = {
           output_amount?: number
           output_decimals?: number
           output_mint?: string
+          parser_version?: number
+          protocol?: string | null
           signature?: string
           source?: string | null
           transaction_id?: string
@@ -130,6 +142,20 @@ export type Database = {
           wallet_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "trades_input_mint_fkey"
+            columns: ["input_mint"]
+            isOneToOne: false
+            referencedRelation: "token_assets"
+            referencedColumns: ["mint"]
+          },
+          {
+            foreignKeyName: "trades_output_mint_fkey"
+            columns: ["output_mint"]
+            isOneToOne: false
+            referencedRelation: "token_assets"
+            referencedColumns: ["mint"]
+          },
           {
             foreignKeyName: "trades_transaction_id_fkey"
             columns: ["transaction_id"]
@@ -153,6 +179,7 @@ export type Database = {
           fee_lamports: number | null
           id: string
           parsed_type: string
+          parser_version: number
           programs: string[]
           raw_transaction_reference: string | null
           signature: string
@@ -168,6 +195,7 @@ export type Database = {
           fee_lamports?: number | null
           id?: string
           parsed_type?: string
+          parser_version?: number
           programs?: string[]
           raw_transaction_reference?: string | null
           signature: string
@@ -183,6 +211,7 @@ export type Database = {
           fee_lamports?: number | null
           id?: string
           parsed_type?: string
+          parser_version?: number
           programs?: string[]
           raw_transaction_reference?: string | null
           signature?: string
