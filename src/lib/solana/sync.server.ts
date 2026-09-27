@@ -7,7 +7,8 @@
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getSignaturesForAddress, getTransactions, type SignatureInfo } from "./rpc.server";
-import { normalizeTransaction, SOL_MINT } from "./parser";
+import { normalizeTransaction, PARSER_VERSION, SOL_MINT, type Normalized } from "./parser";
+import type { ParsedTx } from "./rpc.server";
 
 const BATCH = 25;
 const log = (msg: string, extra: Record<string, unknown> = {}) =>
@@ -73,53 +74,15 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
     const txs = await getTransactions(todo.map((s) => s.signature));
     let inserted = 0;
     let swaps = 0;
-    const mintRows = new Map<string, number>();
 
     for (let i = 0; i < todo.length; i++) {
       const s = todo[i]!;
       const tx = txs[i];
       if (!tx) throw new Error(`Transaction details unavailable for ${s.signature.slice(0, 8)}…`);
       const n = normalizeTransaction(tx, wallet.address);
-      for (const m of n.mints) mintRows.set(m.mint, m.decimals);
-
-      const { data: row, error: insErr } = await db
-        .from("transactions")
-        .upsert(
-          {
-            wallet_id: walletId, signature: s.signature, slot: tx.slot, block_time: iso(tx.blockTime ?? s.blockTime),
-            status: n.status, fee_lamports: n.feeLamports, source: n.source, parsed_type: n.parsedType,
-            programs: n.programs, raw_transaction_reference: `solana:mainnet:${s.signature}`,
-          },
-          { onConflict: "wallet_id,signature", ignoreDuplicates: true },
-        )
-        .select("id")
-        .maybeSingle();
-      if (insErr) throw new Error(`Store failed: ${insErr.message}`);
-      if (!row) continue;
-      inserted++;
-
-      if (n.swap) {
-        const { error: tErr } = await db.from("trades").upsert(
-          {
-            wallet_id: walletId, transaction_id: row.id, signature: s.signature, block_time: iso(tx.blockTime),
-            input_mint: n.swap.inputMint, input_amount: n.swap.inputAmount as unknown as number, input_decimals: n.swap.inputDecimals,
-            output_mint: n.swap.outputMint, output_amount: n.swap.outputAmount as unknown as number, output_decimals: n.swap.outputDecimals,
-            source: n.swap.source, confidence: n.swap.confidence,
-          },
-          { onConflict: "transaction_id", ignoreDuplicates: true },
-        );
-        if (tErr) throw new Error(`Trade store failed: ${tErr.message}`);
-        swaps++;
-      }
-    }
-
-    if (swaps > 0) mintRows.set(SOL_MINT, 9);
-    if (mintRows.size) {
-      // Only decimals are verified from chain data; symbol/name stay null.
-      await db.from("token_assets").upsert(
-        [...mintRows].map(([mint, decimals]) => ({ mint, decimals })),
-        { onConflict: "mint", ignoreDuplicates: true },
-      );
+      const r = await storeNormalized(walletId, s.signature, tx, n, s.blockTime, false);
+      if (r.inserted) inserted++;
+      if (r.trade) swaps++;
     }
 
     // Advance cursors only after the whole batch is stored.
@@ -154,4 +117,87 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
     log("sync failed", { walletId, message });
     return { status: "failed", processed: 0, inserted: 0, swaps: 0, error: message };
   }
+}
+
+/**
+ * Writes one normalized transaction and its trade (if any). Idempotent:
+ * transactions are unique per (wallet, signature) and trades per transaction.
+ * When `update` is true the stored classification is replaced (reprocessing).
+ */
+async function storeNormalized(
+  walletId: string, signature: string, tx: ParsedTx, n: Normalized, fallbackTime: number | null, update: boolean,
+): Promise<{ inserted: boolean; trade: boolean }> {
+  const db = supabaseAdmin;
+  // Token metadata first (trades reference token_assets). Only decimals are verifiable from
+  // chain data; symbol/name/logo stay null rather than being guessed.
+  const mints = new Map(n.mints.map((m) => [m.mint, m.decimals]));
+  if (n.swap) mints.set(SOL_MINT, 9);
+  if (mints.size) {
+    const { error } = await db.from("token_assets").upsert(
+      [...mints].map(([mint, decimals]) => ({ mint, decimals })),
+      { onConflict: "mint", ignoreDuplicates: true },
+    );
+    if (error) throw new Error(`Token store failed: ${error.message}`);
+  }
+
+  const values = {
+    wallet_id: walletId, signature, slot: tx.slot, block_time: iso(tx.blockTime ?? fallbackTime),
+    status: n.status, fee_lamports: n.feeLamports, source: n.source, parsed_type: n.parsedType,
+    programs: n.programs, raw_transaction_reference: `solana:mainnet:${signature}`, parser_version: PARSER_VERSION,
+  };
+  const { data: row, error: insErr } = await db
+    .from("transactions")
+    .upsert(values, { onConflict: "wallet_id,signature", ignoreDuplicates: !update })
+    .select("id")
+    .maybeSingle();
+  if (insErr) throw new Error(`Store failed: ${insErr.message}`);
+  if (!row) return { inserted: false, trade: false };
+
+  if (!n.swap) {
+    if (update) await db.from("trades").delete().eq("transaction_id", row.id);
+    return { inserted: true, trade: false };
+  }
+  const { error: tErr } = await db.from("trades").upsert(
+    {
+      wallet_id: walletId, transaction_id: row.id, signature, block_time: iso(tx.blockTime ?? fallbackTime),
+      input_mint: n.swap.inputMint, input_amount: n.swap.inputAmount as unknown as number, input_decimals: n.swap.inputDecimals,
+      output_mint: n.swap.outputMint, output_amount: n.swap.outputAmount as unknown as number, output_decimals: n.swap.outputDecimals,
+      source: n.swap.source, protocol: n.swap.protocol, direction: n.swap.direction, confidence: n.swap.confidence,
+      fee_lamports: n.feeLamports, parser_version: PARSER_VERSION,
+    },
+    { onConflict: "transaction_id", ignoreDuplicates: !update },
+  );
+  if (tErr) throw new Error(`Trade store failed: ${tErr.message}`);
+  return { inserted: true, trade: true };
+}
+
+/**
+ * Re-runs the current parser over already-indexed transactions whose
+ * parser_version is older. Raw transactions are not stored, so each one is
+ * re-read from RPC once; up-to-date rows are never touched. Call repeatedly
+ * until `remaining` is 0.
+ */
+export async function reprocessWalletBatch(walletId: string, limit = 25): Promise<{ reprocessed: number; trades: number; remaining: number }> {
+  const db = supabaseAdmin;
+  const { data: w } = await db.from("wallets").select("address").eq("id", walletId).single();
+  if (!w) throw new Error("Wallet not found");
+  const { data: rows, error } = await db
+    .from("transactions").select("signature,block_time")
+    .eq("wallet_id", walletId).lt("parser_version", PARSER_VERSION)
+    .order("block_time", { ascending: false }).limit(limit);
+  if (error) throw new Error(error.message);
+  const list = rows ?? [];
+  const txs = await getTransactions(list.map((r) => r.signature));
+  let trades = 0;
+  for (let i = 0; i < list.length; i++) {
+    const tx = txs[i];
+    if (!tx) continue; // leave for the next run rather than guessing
+    const n = normalizeTransaction(tx, w.address);
+    const r = await storeNormalized(walletId, list[i]!.signature, tx, n, null, true);
+    if (r.trade) trades++;
+  }
+  const { count } = await db.from("transactions").select("id", { count: "exact", head: true })
+    .eq("wallet_id", walletId).lt("parser_version", PARSER_VERSION);
+  log("reprocess batch", { walletId, reprocessed: list.length, trades, remaining: count ?? 0 });
+  return { reprocessed: list.length, trades, remaining: count ?? 0 };
 }
