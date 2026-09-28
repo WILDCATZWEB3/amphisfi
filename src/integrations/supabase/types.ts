@@ -14,6 +14,173 @@ export type Database = {
   }
   public: {
     Tables: {
+      performance_snapshots: {
+        Row: {
+          average_trade_pnl_usd: number | null
+          calculated_at: string
+          closed_trade_count: number
+          data_completeness: string
+          id: string
+          largest_loss_usd: number | null
+          largest_win_usd: number | null
+          losing_trades: number
+          method: string
+          network_fees_usd: number | null
+          notes: string[]
+          period: string
+          priced_trade_count: number
+          realized_pnl_usd: number | null
+          total_pnl_usd: number | null
+          trade_count: number
+          unrealized_pnl_usd: number | null
+          volume_usd: number | null
+          wallet_id: string
+          win_rate: number | null
+          winning_trades: number
+        }
+        Insert: {
+          average_trade_pnl_usd?: number | null
+          calculated_at?: string
+          closed_trade_count?: number
+          data_completeness?: string
+          id?: string
+          largest_loss_usd?: number | null
+          largest_win_usd?: number | null
+          losing_trades?: number
+          method?: string
+          network_fees_usd?: number | null
+          notes?: string[]
+          period: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
+          wallet_id: string
+          win_rate?: number | null
+          winning_trades?: number
+        }
+        Update: {
+          average_trade_pnl_usd?: number | null
+          calculated_at?: string
+          closed_trade_count?: number
+          data_completeness?: string
+          id?: string
+          largest_loss_usd?: number | null
+          largest_win_usd?: number | null
+          losing_trades?: number
+          method?: string
+          network_fees_usd?: number | null
+          notes?: string[]
+          period?: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
+          wallet_id?: string
+          win_rate?: number | null
+          winning_trades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_snapshots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      position_lots: {
+        Row: {
+          acquired_at: string | null
+          calculated_at: string
+          cost_basis_usd: number
+          id: string
+          mint: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          wallet_id: string
+        }
+        Insert: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd: number
+          id?: string
+          mint: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          wallet_id: string
+        }
+        Update: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd?: number
+          id?: string
+          mint?: string
+          quantity?: number
+          remaining_cost_basis_usd?: number
+          remaining_quantity?: number
+          source_trade_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "position_lots_source_trade_id_fkey"
+            columns: ["source_trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "position_lots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          mint: string
+          observed_at: string | null
+          price_usd: number | null
+          requested_at: string
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mint: string
+          observed_at?: string | null
+          price_usd?: number | null
+          requested_at: string
+          source: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mint?: string
+          observed_at?: string | null
+          price_usd?: number | null
+          requested_at?: string
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -46,6 +213,69 @@ export type Database = {
           wallet_address?: string | null
         }
         Relationships: []
+      }
+      realized_pnl: {
+        Row: {
+          calculated_at: string
+          cost_basis_usd: number
+          disposed_at: string | null
+          fully_matched: boolean
+          id: string
+          matched_quantity: number
+          mint: string
+          pnl_usd: number
+          price_source: string | null
+          proceeds_usd: number
+          quantity: number
+          trade_id: string
+          wallet_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          cost_basis_usd: number
+          disposed_at?: string | null
+          fully_matched: boolean
+          id?: string
+          matched_quantity: number
+          mint: string
+          pnl_usd: number
+          price_source?: string | null
+          proceeds_usd: number
+          quantity: number
+          trade_id: string
+          wallet_id: string
+        }
+        Update: {
+          calculated_at?: string
+          cost_basis_usd?: number
+          disposed_at?: string | null
+          fully_matched?: boolean
+          id?: string
+          matched_quantity?: number
+          mint?: string
+          pnl_usd?: number
+          price_source?: string | null
+          proceeds_usd?: number
+          quantity?: number
+          trade_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "realized_pnl_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "realized_pnl_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       token_assets: {
         Row: {
@@ -84,19 +314,27 @@ export type Database = {
           created_at: string
           direction: string
           fee_lamports: number | null
+          fee_usd: number | null
           id: string
           input_amount: number
           input_decimals: number
           input_mint: string
+          input_value_usd: number | null
           output_amount: number
           output_decimals: number
           output_mint: string
+          output_value_usd: number | null
           parser_version: number
+          price_source: string | null
+          price_timestamp: string | null
           protocol: string | null
           signature: string
           source: string | null
+          trade_value_usd: number | null
           transaction_id: string
           updated_at: string
+          valuation_status: string
+          valued_at: string | null
           wallet_id: string
         }
         Insert: {
@@ -105,19 +343,27 @@ export type Database = {
           created_at?: string
           direction?: string
           fee_lamports?: number | null
+          fee_usd?: number | null
           id?: string
           input_amount: number
           input_decimals: number
           input_mint: string
+          input_value_usd?: number | null
           output_amount: number
           output_decimals: number
           output_mint: string
+          output_value_usd?: number | null
           parser_version?: number
+          price_source?: string | null
+          price_timestamp?: string | null
           protocol?: string | null
           signature: string
           source?: string | null
+          trade_value_usd?: number | null
           transaction_id: string
           updated_at?: string
+          valuation_status?: string
+          valued_at?: string | null
           wallet_id: string
         }
         Update: {
@@ -126,19 +372,27 @@ export type Database = {
           created_at?: string
           direction?: string
           fee_lamports?: number | null
+          fee_usd?: number | null
           id?: string
           input_amount?: number
           input_decimals?: number
           input_mint?: string
+          input_value_usd?: number | null
           output_amount?: number
           output_decimals?: number
           output_mint?: string
+          output_value_usd?: number | null
           parser_version?: number
+          price_source?: string | null
+          price_timestamp?: string | null
           protocol?: string | null
           signature?: string
           source?: string | null
+          trade_value_usd?: number | null
           transaction_id?: string
           updated_at?: string
+          valuation_status?: string
+          valued_at?: string | null
           wallet_id?: string
         }
         Relationships: [
