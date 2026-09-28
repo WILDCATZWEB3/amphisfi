@@ -1,5 +1,6 @@
 import { useAvatarUrl } from "@/lib/account";
 import { cn } from "@/lib/utils";
+import { BrandMark } from "./BrandMark";
 
 /** Default Amphis avatar when no PFP is set — the brand mark, never a random avatar. */
 export function Avatar({
@@ -26,11 +27,7 @@ export function Avatar({
       {url ? (
         <img src={url} alt="Profile picture" className="h-full w-full object-cover" />
       ) : (
-        <span
-          className="rounded-sm border border-accent bg-accent/20"
-          style={{ width: size * 0.3, height: size * 0.3 }}
-          aria-hidden
-        />
+        <BrandMark className="h-[58%] w-[76%]" alt="" />
       )}
     </div>
   );
