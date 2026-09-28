@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 import { Avatar } from "./Avatar";
+import { BrandMark } from "./BrandMark";
 import { WalletButton } from "./WalletButton";
 import { useMyProfile, useSession } from "@/lib/account";
 
@@ -37,7 +38,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-2 sm:gap-4">
         <Link to="/" className="flex shrink-0 items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="h-4 w-4 rounded-sm border border-accent bg-accent/20" aria-hidden />
+          <BrandMark className="h-7 w-9" alt="" />
           <span className="text-base font-semibold tracking-tight">Amphis</span>
         </Link>
 
