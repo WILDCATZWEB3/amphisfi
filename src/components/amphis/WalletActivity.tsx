@@ -40,7 +40,7 @@ export function WalletActivity({ profileId }: { profileId: string }) {
         const r = await sync({ data: { walletId: wallet.id } });
         if (r.status === "failed") throw new Error(r.error ?? "Sync failed");
         await qc.invalidateQueries({ queryKey: ["wallet-activity", profileId] });
-        if (r.status === "completed") break;
+        if (r.status === "completed" || r.processed === 0) break;
       }
       for (let i = 0; i < 20; i++) {
         const r = await reprocess({ data: { walletId: wallet.id } });
