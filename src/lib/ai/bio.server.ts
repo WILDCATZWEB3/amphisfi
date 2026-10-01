@@ -20,7 +20,7 @@ export async function rewriteBio(draft: string, signal?: AbortSignal): Promise<s
     model: provider.responses("openai/gpt-6-astra"),
     system: SYSTEM,
     prompt: `Draft bio:\n${draft}`,
-    abortSignal: signal,
+    ...(signal ? { abortSignal: signal } : {}),
     providerOptions: {
       openai: {
         store: false,
