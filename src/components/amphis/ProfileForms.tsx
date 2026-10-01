@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { sanitizeUsername, type MyProfile } from "@/lib/account";
 import { useWallet } from "@/lib/solana/WalletContext";
 import { buildLinkMessage, linkWallet } from "@/lib/wallet-link.functions";
+import { polishBio } from "@/lib/ai/bio.functions";
 
 export const inputCls =
   "h-11 w-full rounded-md border border-border bg-input px-3 text-sm outline-none focus:ring-1 focus:ring-ring";
@@ -40,6 +41,22 @@ export function ProfileEditor({
   const qc = useQueryClient();
   const [username, setUsername] = useState(profile?.username ?? "");
   const [bio, setBio] = useState(profile?.bio ?? "");
+  const [polishing, setPolishing] = useState(false);
+  const [polishError, setPolishError] = useState<string | null>(null);
+  const [prevBio, setPrevBio] = useState<string | null>(null);
+  const polishFn = useServerFn(polishBio);
+  async function polish() {
+    setPolishing(true);
+    setPolishError(null);
+    try {
+      const r = await polishFn({ data: { draft: bio } });
+      if (r.bio) { setPrevBio(bio); setBio(r.bio); } else setPolishError(r.error);
+    } catch {
+      setPolishError("Couldn't polish the bio right now.");
+    } finally {
+      setPolishing(false);
+    }
+  }
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -147,7 +164,17 @@ export function ProfileEditor({
         </p>
       </div>
       <div>
-        <label className="text-xs text-muted-foreground" htmlFor="bio">Bio</label>
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs text-muted-foreground" htmlFor="bio">Bio</label>
+          <button
+            type="button"
+            onClick={polish}
+            disabled={polishing || bio.trim().length < 3}
+            className="text-xs text-accent hover:underline disabled:opacity-40 disabled:no-underline"
+          >
+            {polishing ? "Polishing…" : "Polish with AI"}
+          </button>
+        </div>
         <textarea
           id="bio"
           value={bio}
@@ -156,6 +183,13 @@ export function ProfileEditor({
           className="mt-1 min-h-20 w-full rounded-md border border-border bg-input px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
           placeholder="Optional, up to 160 characters"
         />
+        {prevBio !== null ? (
+          <p className="mt-1 text-xs text-muted-foreground">
+            AI suggestion applied. Review before saving.{" "}
+            <button type="button" className="underline" onClick={() => { setBio(prevBio); setPrevBio(null); }}>Undo</button>
+          </p>
+        ) : null}
+        {polishError ? <p className="mt-1 text-xs text-destructive">{polishError}</p> : null}
       </div>
       <Button type="submit" className="w-full" disabled={busy || status !== "available"}>
         {busy ? "Saving…" : submitLabel}
