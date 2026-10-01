@@ -43,6 +43,13 @@ async function post(body: unknown, attempt = 0): Promise<unknown> {
     }
     throw new Error(res.status === 429 ? "RPC rate limit reached" : `RPC error ${res.status}`);
   }
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(
+      usingPublicRpc()
+        ? "The public Solana RPC refused this server. A private RPC URL (SOLANA_RPC_URL) is required."
+        : `The configured Solana RPC rejected the request (${res.status}). Check SOLANA_RPC_URL.`,
+    );
+  }
   if (!res.ok) throw new Error(`RPC request failed (${res.status})`);
   return res.json();
 }

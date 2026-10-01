@@ -23,12 +23,14 @@ export function WalletActivity({ profileId }: { profileId: string }) {
       if (!w) return null;
       const { count } = await supabase.from("trades").select("id", { count: "exact", head: true })
         .eq("wallet_id", w.id).in("confidence", ["high", "medium"]);
-      return { wallet: w, trades: count ?? 0 };
+      const { count: txCount } = await supabase.from("transactions").select("id", { count: "exact", head: true })
+        .eq("wallet_id", w.id);
+      return { wallet: w, trades: count ?? 0, txCount: txCount ?? 0 };
     },
   });
 
   if (!q.data) return null;
-  const { wallet, trades } = q.data;
+  const { wallet, trades, txCount } = q.data;
 
   const run = async () => {
     setBusy(true);
@@ -38,7 +40,7 @@ export function WalletActivity({ profileId }: { profileId: string }) {
         const r = await sync({ data: { walletId: wallet.id } });
         if (r.status === "failed") throw new Error(r.error ?? "Sync failed");
         await qc.invalidateQueries({ queryKey: ["wallet-activity", profileId] });
-        if (r.status === "completed") break;
+        if (r.status === "completed" || r.processed === 0) break;
       }
       for (let i = 0; i < 20; i++) {
         const r = await reprocess({ data: { walletId: wallet.id } });
@@ -63,6 +65,10 @@ export function WalletActivity({ profileId }: { profileId: string }) {
         <span>{label[wallet.sync_status] ?? wallet.sync_status}</span>
       </div>
       {wallet.sync_error ? <p className="text-xs text-destructive">{wallet.sync_error}</p> : null}
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="text-muted-foreground">Transactions indexed</span>
+        <span>{wallet.sync_status === "completed" && txCount === 0 ? "No wallet activity found." : txCount}</span>
+      </div>
       <div>
         <p className="text-xs text-muted-foreground">Trading activity</p>
         <p className="mt-1 text-sm">

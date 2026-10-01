@@ -72,13 +72,23 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
     const todo = sigs.filter((s) => !have.has(s.signature));
 
     const txs = await getTransactions(todo.map((s) => s.signature));
+    // Retry individually any transaction the batch could not return.
+    for (let i = 0; i < todo.length; i++) {
+      if (!txs[i]) txs[i] = (await getTransactions([todo[i]!.signature]).catch(() => [null]))[0] ?? null;
+    }
     let inserted = 0;
     let swaps = 0;
+    let unavailable = 0;
 
     for (let i = 0; i < todo.length; i++) {
       const s = todo[i]!;
       const tx = txs[i];
-      if (!tx) throw new Error(`Transaction details unavailable for ${s.signature.slice(0, 8)}…`);
+      if (!tx) {
+        // Keep the signature with parser_version 0 so a later reprocess fetches it again.
+        await storeUnavailable(walletId, s);
+        unavailable++;
+        continue;
+      }
       const n = normalizeTransaction(tx, wallet.address);
       const r = await storeNormalized(walletId, s.signature, tx, n, s.blockTime, false);
       if (r.inserted) inserted++;
@@ -106,7 +116,8 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
     const backfillDone = wallet.backfill_complete || (mode === "backfill" && sigs.length < BATCH);
     patch["backfill_complete"] = backfillDone;
     const done = backfillDone && (mode === "backfill" || sigs.length < BATCH);
-    patch["sync_status"] = done ? "completed" : "partial";
+    patch["sync_status"] = done && unavailable === 0 ? "completed" : "partial";
+    patch["sync_error"] = unavailable ? `${unavailable} transaction(s) could not be retrieved yet; they will be retried.` : null;
     await db.from("wallets").update(patch as never).eq("id", walletId);
 
     log(done ? "sync completed" : "sync progress", { walletId, mode, processed: sigs.length, inserted, swaps });
@@ -117,6 +128,18 @@ export async function syncWalletBatch(walletId: string): Promise<SyncResult> {
     log("sync failed", { walletId, message });
     return { status: "failed", processed: 0, inserted: 0, swaps: 0, error: message };
   }
+}
+
+async function storeUnavailable(walletId: string, s: SignatureInfo) {
+  const { error } = await supabaseAdmin.from("transactions").upsert(
+    {
+      wallet_id: walletId, signature: s.signature, slot: s.slot, block_time: iso(s.blockTime),
+      status: s.err ? "failed" : "unretrieved", parsed_type: "unknown", parser_version: 0,
+      raw_transaction_reference: `solana:mainnet:${s.signature}`,
+    },
+    { onConflict: "wallet_id,signature", ignoreDuplicates: true },
+  );
+  if (error) throw new Error(`Store failed: ${error.message}`);
 }
 
 /**
