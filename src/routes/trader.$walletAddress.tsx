@@ -5,13 +5,13 @@ import { Avatar } from "@/components/amphis/Avatar";
 import { Card, CardHeader } from "@/components/amphis/Card";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
-import { isLikelySolanaAddress, shortenAddress } from "@/lib/solana/wallets";
+import { isEvmAddress, normalizeAddress, shortenAddress } from "@/lib/evm/address";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/trader/$walletAddress")({
   head: ({ params }) => {
     const title = `Trader ${shortenAddress(params.walletAddress, 4)} — Amphis`;
-    const description = `Verified Solana trading reputation for ${params.walletAddress}.`;
+    const description = `Verified Robinhood Chain trading reputation for ${params.walletAddress}.`;
     return {
       meta: [
         { title },
@@ -36,19 +36,20 @@ const SECTIONS = [
 
 function TraderProfile() {
   const { walletAddress } = Route.useParams();
-  const valid = isLikelySolanaAddress(walletAddress);
+  const valid = isEvmAddress(walletAddress);
 
   const profileQuery = useQuery({
     queryKey: ["profile", walletAddress],
     enabled: valid,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("username, bio, avatar_url, created_at")
-        .eq("wallet_address", walletAddress)
+        .from("wallets")
+        .select("profiles(username, bio, avatar_url, created_at)")
+        .eq("chain", "robinhood")
+        .eq("address_normalized", normalizeAddress(walletAddress))
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data?.profiles ?? null;
     },
   });
 
@@ -57,7 +58,7 @@ function TraderProfile() {
       <div className="container-page py-16">
         <ErrorState
           title="Invalid wallet address"
-          description="This does not look like a Solana wallet address."
+          description="This does not look like an EVM wallet address."
         />
       </div>
     );

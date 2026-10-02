@@ -11,13 +11,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Turn your real Solana trading activity into a reputation you can prove.",
+          "Turn your real Robinhood Chain trading activity into a reputation you can prove.",
       },
       { property: "og:title", content: "Amphis — Your trading reputation." },
       {
         property: "og:description",
         content:
-          "Turn your real Solana trading activity into a reputation you can prove.",
+          "Turn your real Robinhood Chain trading activity into a reputation you can prove.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -37,13 +37,13 @@ function Landing() {
     <div className="container-page">
       <section className="border-b border-border py-20 sm:py-28">
         <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
-          Solana-native trader reputation
+          Robinhood Chain-native trader reputation
         </p>
         <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
           Your trading reputation.
         </h1>
         <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-          Turn your real Solana trading activity into a reputation you can prove.
+          Turn your real Robinhood Chain trading activity into a reputation you can prove.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
           <WalletButton className="w-full sm:w-auto" />

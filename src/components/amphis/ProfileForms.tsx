@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import bs58 from "bs58";
 import { useEffect, useState } from "react";
 
 import { Avatar } from "./Avatar";
@@ -9,7 +8,7 @@ import { WalletAddress } from "./WalletAddress";
 import { WalletButton } from "./WalletButton";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeUsername, type MyProfile } from "@/lib/account";
-import { useWallet } from "@/lib/solana/WalletContext";
+import { useWallet } from "@/lib/evm/WalletContext";
 import { buildLinkMessage, linkWallet } from "@/lib/wallet-link.functions";
 import { polishBio } from "@/lib/ai/bio.functions";
 
@@ -211,7 +210,7 @@ export function WalletLinker({
   onLinked?: () => void;
 }) {
   const qc = useQueryClient();
-  const { address, signMessage } = useWallet();
+  const { address, signMessage, wrongNetwork } = useWallet();
   const link = useServerFn(linkWallet);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -223,7 +222,7 @@ export function WalletLinker({
     try {
       const issuedAt = new Date().toISOString();
       const sig = await signMessage(buildLinkMessage(userId, address, issuedAt));
-      await link({ data: { address, issuedAt, signature: bs58.encode(sig) } });
+      await link({ data: { address, issuedAt, signature: sig } });
       await qc.invalidateQueries({ queryKey: ["my-profile", userId] });
       onLinked?.();
     } catch (e) {
@@ -248,7 +247,7 @@ export function WalletLinker({
       ) : address === linked ? null : (
         <>
           <p className="text-xs text-muted-foreground">
-            Connected: <span className="font-mono">{address.slice(0, 4)}…{address.slice(-4)}</span>. Sign a free
+            Connected: <span className="font-mono">{address.slice(0, 6)}…{address.slice(-4)}</span>. Sign a free
             message to prove you own it — no transaction, no fee, no approval.
           </p>
           <Button onClick={() => void verify()} disabled={busy} className="w-full">

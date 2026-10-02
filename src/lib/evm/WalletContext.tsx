@@ -65,7 +65,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const onAnnounce = (e: Event) => {
       const d = (e as CustomEvent).detail as { info: { rdns?: string; uuid: string; name: string; icon?: string }; provider: Eip1193 };
       const id = d.info.rdns || d.info.uuid;
-      found.set(id, { id, name: d.info.name, icon: d.info.icon, provider: d.provider });
+      found.set(id, { id, name: d.info.name, provider: d.provider, ...(d.info.icon ? { icon: d.info.icon } : {}) });
       push();
     };
     window.addEventListener("eip6963:announceProvider", onAnnounce);

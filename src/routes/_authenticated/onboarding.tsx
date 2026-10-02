@@ -9,9 +9,9 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
     meta: [
       { title: "Set up your profile — Amphis" },
-      { name: "description", content: "Claim your username, add a picture and verify your Solana wallet." },
+      { name: "description", content: "Claim your username, add a picture and verify your Robinhood Chain wallet." },
       { property: "og:title", content: "Set up your profile — Amphis" },
-      { property: "og:description", content: "Claim your username, add a picture and verify your Solana wallet." },
+      { property: "og:description", content: "Claim your username, add a picture and verify your Robinhood Chain wallet." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
