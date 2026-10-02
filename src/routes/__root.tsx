@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar } from "@/components/amphis/Navbar";
 import { Footer } from "@/components/amphis/Footer";
-import { WalletProvider } from "@/lib/solana/WalletContext";
+import { WalletProvider } from "@/lib/evm/WalletContext";
 
 function NotFoundComponent() {
   return (

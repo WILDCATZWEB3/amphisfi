@@ -14,6 +14,161 @@ export type Database = {
   }
   public: {
     Tables: {
+      evm_logs: {
+        Row: {
+          address: string
+          block_number: number
+          chain: string
+          created_at: string
+          data: string
+          id: string
+          log_index: number
+          topic0: string | null
+          topics: string[]
+          transaction_hash: string
+          transaction_id: string
+        }
+        Insert: {
+          address: string
+          block_number: number
+          chain: string
+          created_at?: string
+          data?: string
+          id?: string
+          log_index: number
+          topic0?: string | null
+          topics?: string[]
+          transaction_hash: string
+          transaction_id: string
+        }
+        Update: {
+          address?: string
+          block_number?: number
+          chain?: string
+          created_at?: string
+          data?: string
+          id?: string
+          log_index?: number
+          topic0?: string | null
+          topics?: string[]
+          transaction_hash?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_logs_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evm_tokens: {
+        Row: {
+          address: string
+          chain: string
+          created_at: string
+          decimals: number | null
+          name: string | null
+          symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          chain: string
+          created_at?: string
+          decimals?: number | null
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          chain?: string
+          created_at?: string
+          decimals?: number | null
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      evm_transactions: {
+        Row: {
+          block_hash: string | null
+          block_number: number
+          block_time: string | null
+          chain: string
+          contract_address: string | null
+          created_at: string
+          effective_gas_price_wei: number | null
+          from_address: string
+          gas_limit: number | null
+          gas_price_wei: number | null
+          gas_used: number | null
+          hash: string
+          id: string
+          input: string | null
+          log_count: number
+          method_selector: string | null
+          nonce: number | null
+          status: string
+          to_address: string | null
+          tx_index: number | null
+          tx_type: string | null
+          value_wei: number
+        }
+        Insert: {
+          block_hash?: string | null
+          block_number: number
+          block_time?: string | null
+          chain: string
+          contract_address?: string | null
+          created_at?: string
+          effective_gas_price_wei?: number | null
+          from_address: string
+          gas_limit?: number | null
+          gas_price_wei?: number | null
+          gas_used?: number | null
+          hash: string
+          id?: string
+          input?: string | null
+          log_count?: number
+          method_selector?: string | null
+          nonce?: number | null
+          status: string
+          to_address?: string | null
+          tx_index?: number | null
+          tx_type?: string | null
+          value_wei?: number
+        }
+        Update: {
+          block_hash?: string | null
+          block_number?: number
+          block_time?: string | null
+          chain?: string
+          contract_address?: string | null
+          created_at?: string
+          effective_gas_price_wei?: number | null
+          from_address?: string
+          gas_limit?: number | null
+          gas_price_wei?: number | null
+          gas_used?: number | null
+          hash?: string
+          id?: string
+          input?: string | null
+          log_count?: number
+          method_selector?: string | null
+          nonce?: number | null
+          status?: string
+          to_address?: string | null
+          tx_index?: number | null
+          tx_type?: string | null
+          value_wei?: number
+        }
+        Relationships: []
+      }
       performance_snapshots: {
         Row: {
           average_trade_pnl_usd: number | null
@@ -307,6 +462,62 @@ export type Database = {
         }
         Relationships: []
       }
+      token_transfers: {
+        Row: {
+          amount_raw: number
+          block_number: number
+          block_time: string | null
+          chain: string
+          created_at: string
+          from_address: string
+          id: string
+          log_index: number
+          standard: string
+          to_address: string
+          token_address: string
+          transaction_hash: string
+          transaction_id: string
+        }
+        Insert: {
+          amount_raw: number
+          block_number: number
+          block_time?: string | null
+          chain: string
+          created_at?: string
+          from_address: string
+          id?: string
+          log_index: number
+          standard?: string
+          to_address: string
+          token_address: string
+          transaction_hash: string
+          transaction_id: string
+        }
+        Update: {
+          amount_raw?: number
+          block_number?: number
+          block_time?: string | null
+          chain?: string
+          created_at?: string
+          from_address?: string
+          id?: string
+          log_index?: number
+          standard?: string
+          to_address?: string
+          token_address?: string
+          transaction_hash?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_transfers_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trades: {
         Row: {
           block_time: string | null
@@ -485,59 +696,131 @@ export type Database = {
           },
         ]
       }
+      wallet_transactions: {
+        Row: {
+          block_number: number
+          created_at: string
+          id: string
+          role: string
+          transaction_id: string
+          wallet_id: string
+        }
+        Insert: {
+          block_number: number
+          created_at?: string
+          id?: string
+          role: string
+          transaction_id: string
+          wallet_id: string
+        }
+        Update: {
+          block_number?: number
+          created_at?: string
+          id?: string
+          role?: string
+          transaction_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallets: {
         Row: {
           address: string
+          address_normalized: string | null
           backfill_complete: boolean
+          blocks_processed: number
+          chain: string
           created_at: string
           first_seen_at: string
           id: string
+          is_primary: boolean
+          last_indexed_block: number | null
+          last_indexed_transaction: string | null
           last_signature: string | null
           last_synced_at: string | null
           newest_block_time: string | null
           newest_signature: string | null
           oldest_block_time: string | null
+          oldest_indexed_block: number | null
           oldest_signature: string | null
+          ownership_verified: boolean
           profile_id: string
           sync_error: string | null
           sync_started_at: string | null
           sync_status: string
+          txs_discovered: number
+          txs_stored: number
           updated_at: string
         }
         Insert: {
           address: string
+          address_normalized?: string | null
           backfill_complete?: boolean
+          blocks_processed?: number
+          chain?: string
           created_at?: string
           first_seen_at?: string
           id?: string
+          is_primary?: boolean
+          last_indexed_block?: number | null
+          last_indexed_transaction?: string | null
           last_signature?: string | null
           last_synced_at?: string | null
           newest_block_time?: string | null
           newest_signature?: string | null
           oldest_block_time?: string | null
+          oldest_indexed_block?: number | null
           oldest_signature?: string | null
+          ownership_verified?: boolean
           profile_id: string
           sync_error?: string | null
           sync_started_at?: string | null
           sync_status?: string
+          txs_discovered?: number
+          txs_stored?: number
           updated_at?: string
         }
         Update: {
           address?: string
+          address_normalized?: string | null
           backfill_complete?: boolean
+          blocks_processed?: number
+          chain?: string
           created_at?: string
           first_seen_at?: string
           id?: string
+          is_primary?: boolean
+          last_indexed_block?: number | null
+          last_indexed_transaction?: string | null
           last_signature?: string | null
           last_synced_at?: string | null
           newest_block_time?: string | null
           newest_signature?: string | null
           oldest_block_time?: string | null
+          oldest_indexed_block?: number | null
           oldest_signature?: string | null
+          ownership_verified?: boolean
           profile_id?: string
           sync_error?: string | null
           sync_started_at?: string | null
           sync_status?: string
+          txs_discovered?: number
+          txs_stored?: number
           updated_at?: string
         }
         Relationships: [

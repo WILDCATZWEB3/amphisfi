@@ -36,6 +36,13 @@
       "when": 1790594483102,
       "tag": "0004_performance_engine",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790925713163,
+      "tag": "0005_robinhood_chain_foundation",
+      "breakpoints": true
     }
   ]
 }
