@@ -5,10 +5,10 @@
 import { defineChain } from "viem";
 
 export const CHAIN_KEY = "robinhood" as const;
-export const ROBINHOOD_CHAIN_ID = Number(import.meta.env.VITE_ROBINHOOD_CHAIN_ID ?? 4663) || 4663;
+export const ROBINHOOD_CHAIN_ID = Number(import.meta.env['VITE_ROBINHOOD_CHAIN_ID'] ?? 4663) || 4663;
 export const ROBINHOOD_CHAIN_HEX = `0x${ROBINHOOD_CHAIN_ID.toString(16)}`;
 export const ROBINHOOD_PUBLIC_RPC =
-  (import.meta.env.VITE_ROBINHOOD_RPC_URL as string | undefined) || "https://rpc.mainnet.chain.robinhood.com";
+  (import.meta.env['VITE_ROBINHOOD_RPC_URL'] as string | undefined) || "https://rpc.mainnet.chain.robinhood.com";
 export const ROBINHOOD_EXPLORER = "https://robinhoodchain.blockscout.com";
 
 export const robinhoodChain = defineChain({

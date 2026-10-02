@@ -15,13 +15,13 @@ export const Route = createFileRoute("/leaderboard")({
       {
         name: "description",
         content:
-          "Verified Solana trader rankings across 7 day, 30 day and all-time windows.",
+          "Verified Robinhood Chain trader rankings across 7 day, 30 day and all-time windows.",
       },
       { property: "og:title", content: "Leaderboard — Amphis" },
       {
         property: "og:description",
         content:
-          "Verified Solana trader rankings across 7 day, 30 day and all-time windows.",
+          "Verified Robinhood Chain trader rankings across 7 day, 30 day and all-time windows.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

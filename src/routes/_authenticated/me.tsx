@@ -15,9 +15,9 @@ export const Route = createFileRoute("/_authenticated/me")({
   head: () => ({
     meta: [
       { title: "My Profile — Amphis" },
-      { name: "description", content: "Manage your Amphis identity, picture and verified Solana wallet." },
+      { name: "description", content: "Manage your Amphis identity, picture and verified Robinhood Chain wallet." },
       { property: "og:title", content: "My Profile — Amphis" },
-      { property: "og:description", content: "Manage your Amphis identity, picture and verified Solana wallet." },
+      { property: "og:description", content: "Manage your Amphis identity, picture and verified Robinhood Chain wallet." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

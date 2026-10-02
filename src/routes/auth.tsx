@@ -111,7 +111,7 @@ function AuthPage() {
       <div className="w-full max-w-sm">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Build your trading reputation.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Create your Amphis identity and connect your Solana wallet to start building your verified trading profile.
+          Create your Amphis identity and connect your Robinhood Chain wallet to start building your verified trading profile.
         </p>
 
         <div className="mt-8 space-y-3">
@@ -151,7 +151,7 @@ function AuthPage() {
         </div>
 
         <p className="mt-8 text-xs text-muted-foreground">
-          Signing in creates your Amphis account. It does not prove ownership of any Solana wallet — that is verified separately with a wallet signature.
+          Signing in creates your Amphis account. It does not prove ownership of any Robinhood Chain wallet — that is verified separately with a wallet signature.
         </p>
       </div>
     </div>

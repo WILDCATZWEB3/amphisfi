@@ -10,13 +10,13 @@ export const Route = createFileRoute("/explore")({
       {
         name: "description",
         content:
-          "Discover Solana traders with verified, on-chain performance histories on Amphis.",
+          "Discover Robinhood Chain traders with verified, on-chain performance histories on Amphis.",
       },
       { property: "og:title", content: "Explore Traders — Amphis" },
       {
         property: "og:description",
         content:
-          "Discover Solana traders with verified, on-chain performance histories on Amphis.",
+          "Discover Robinhood Chain traders with verified, on-chain performance histories on Amphis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -30,7 +30,7 @@ function ExplorePage() {
     <div className="container-page py-12 sm:py-16">
       <PageHeader
         title="Explore"
-        description="Trader discovery built on verified Solana activity."
+        description="Trader discovery built on verified Robinhood Chain activity."
       />
       <div className="mt-10">
         <EmptyState

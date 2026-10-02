@@ -13,6 +13,7 @@ export function buildLinkMessage(userId: string, address: string, issuedAt: stri
     "Sign this message to prove you own this wallet.",
     "This is free, sends no transaction and grants no approvals.",
     "",
+    "Network: Robinhood Chain (4663)",
     `Account: ${userId}`,
     `Wallet: ${address}`,
     `Issued: ${issuedAt}`,
@@ -24,70 +25,57 @@ export const linkWallet = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z
       .object({
-        address: z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/),
+        address: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
         issuedAt: z.string().datetime(),
-        signature: z.string().min(40).max(120),
+        signature: z.string().regex(/^0x[0-9a-fA-F]+$/).max(4000),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const [{ default: nacl }, { default: bs58 }] = await Promise.all([
-      import("tweetnacl"),
-      import("bs58"),
-    ]);
+    const { createPublicClient, http, getAddress } = await import("viem");
+    const { robinhoodChain } = await import("@/lib/chains/robinhood/config");
 
     const age = Date.now() - new Date(data.issuedAt).getTime();
     if (age < -60_000 || age > MAX_AGE_MS) throw new Error("Signature expired. Please try again.");
 
-    let pubkey: Uint8Array;
-    let sig: Uint8Array;
-    try {
-      pubkey = bs58.decode(data.address);
-      sig = bs58.decode(data.signature);
-    } catch {
-      throw new Error("Invalid wallet address or signature.");
-    }
-    if (pubkey.length !== 32 || sig.length !== 64) throw new Error("Invalid wallet address or signature.");
+    const address = getAddress(data.address.toLowerCase());
+    const normalized = address.toLowerCase();
+    const client = createPublicClient({
+      chain: robinhoodChain,
+      transport: http(process.env["ROBINHOOD_RPC_URL"] || "https://rpc.mainnet.chain.robinhood.com"),
+    });
+    // Supports regular wallets and smart-contract wallets (ERC-1271).
+    const ok = await client
+      .verifyMessage({
+        address,
+        message: buildLinkMessage(context.userId, data.address, data.issuedAt),
+        signature: data.signature as `0x${string}`,
+      })
+      .catch(() => false);
+    if (!ok) throw new Error("Signature does not match this wallet.");
 
-    const message = new TextEncoder().encode(
-      buildLinkMessage(context.userId, data.address, data.issuedAt),
-    );
-    if (!nacl.sign.detached.verify(message, sig, pubkey)) {
-      throw new Error("Signature does not match this wallet.");
-    }
-
-    // Ownership proven — privileged write so clients can never write wallet rows directly.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: profile, error: pErr } = await supabaseAdmin
-      .from("profiles")
-      .select("id")
-      .eq("user_id", context.userId)
-      .maybeSingle();
-    if (pErr) throw new Error("Could not load your profile.");
+    const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("user_id", context.userId).maybeSingle();
     if (!profile) throw new Error("Create your Amphis profile first.");
 
     const { data: existing } = await supabaseAdmin
-      .from("wallets")
-      .select("profile_id")
-      .eq("address", data.address)
-      .maybeSingle();
+      .from("wallets").select("id,profile_id").eq("chain", "robinhood").eq("address_normalized", normalized).maybeSingle();
     if (existing && existing.profile_id !== profile.id) {
       throw new Error("This wallet is already linked to another Amphis account.");
     }
 
-    if (!existing) {
-      const { error } = await supabaseAdmin
-        .from("wallets")
-        .insert({ profile_id: profile.id, address: data.address });
+    await supabaseAdmin.from("wallets").update({ is_primary: false }).eq("profile_id", profile.id).eq("chain", "robinhood");
+    if (existing) {
+      await supabaseAdmin.from("wallets").update({ is_primary: true, ownership_verified: true }).eq("id", existing.id);
+    } else {
+      const { error } = await supabaseAdmin.from("wallets").insert({
+        profile_id: profile.id, chain: "robinhood", address, address_normalized: normalized,
+        is_primary: true, ownership_verified: true,
+      });
       if (error) throw new Error("Could not link wallet.");
     }
 
-    const { error: uErr } = await supabaseAdmin
-      .from("profiles")
-      .update({ wallet_address: data.address })
-      .eq("id", profile.id);
+    const { error: uErr } = await supabaseAdmin.from("profiles").update({ wallet_address: address }).eq("id", profile.id);
     if (uErr) throw new Error("Could not update profile wallet.");
-
-    return { ok: true, address: data.address };
+    return { ok: true, address };
   });

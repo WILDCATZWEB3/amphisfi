@@ -83,13 +83,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Amphis — Your trading reputation." },
       {
         name: "description",
-        content: "Turn your real Solana trading activity into a reputation you can prove.",
+        content: "Turn your real Robinhood Chain trading activity into a reputation you can prove.",
       },
       { name: "author", content: "Amphis" },
       { property: "og:title", content: "Amphis — Your trading reputation." },
       {
         property: "og:description",
-        content: "Turn your real Solana trading activity into a reputation you can prove.",
+        content: "Turn your real Robinhood Chain trading activity into a reputation you can prove.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

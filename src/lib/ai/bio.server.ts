@@ -1,7 +1,7 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 
-const SYSTEM = `You rewrite a trader's draft profile bio for Amphis, a Solana trader reputation platform.
+const SYSTEM = `You rewrite a trader's draft profile bio for Amphis, a Robinhood Chain trader reputation platform.
 Rules:
 - Keep only facts present in the draft. Never invent or add trading claims, returns, PnL, win rates, track records, followers, titles, years of experience, or any numbers not in the draft.
 - If the draft makes performance claims, drop or soften them rather than amplifying them.
