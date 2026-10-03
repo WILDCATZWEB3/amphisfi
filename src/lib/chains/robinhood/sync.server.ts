@@ -91,7 +91,7 @@ export async function syncRobinhoodWallet(walletId: string): Promise<SyncResult>
     const done = backfillDone && forward >= head;
     await db.from("wallets").update({
       last_indexed_block: forward, oldest_indexed_block: Math.max(0, backward), backfill_complete: backfillDone,
-      last_indexed_transaction: [...hashes.keys()].pop() ?? undefined,
+      last_indexed_transaction: [...hashes.keys()].pop() ?? null,
       txs_discovered: (w.txs_discovered ?? 0) + hashes.size, txs_stored: (w.txs_stored ?? 0) + stored,
       blocks_processed: Number(w.blocks_processed ?? 0) + scanned,
       last_synced_at: new Date().toISOString(), sync_status: done ? "completed" : "partial", sync_error: null,
@@ -151,7 +151,7 @@ async function storeTransaction(c: ReturnType<typeof client>, walletId: string, 
       standard: l.topics.length === 4 ? "erc721" : "erc20",
       from_address: topicAddr(l.topics[1]), to_address: topicAddr(l.topics[2]),
       amount_raw: l.topics.length === 4 ? "1" : BigInt(l.data === "0x" ? 0 : l.data).toString(),
-    })), { onConflict: "chain,transaction_hash,log_index", ignoreDuplicates: true });
+    })) as never, { onConflict: "chain,transaction_hash,log_index", ignoreDuplicates: true });
     if (tErr) throw new Error(`Transfer store failed: ${tErr.message}`);
   }
 
