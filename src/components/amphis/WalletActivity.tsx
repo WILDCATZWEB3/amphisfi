@@ -1,52 +1,53 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/amphis/Button";
 import { supabase } from "@/integrations/supabase/client";
-import { reprocessMyWallet, syncMyWallet } from "@/lib/wallet-sync.functions";
+import { syncMyWallet } from "@/lib/wallet-sync.functions";
 
-/** Sync status + count of verified (high/medium confidence) detected trades. No PnL, volume or rank. */
+/** Robinhood Chain sync status and real indexed counts. No PnL, volume or rank. */
 export function WalletActivity({ profileId }: { profileId: string }) {
   const qc = useQueryClient();
   const sync = useServerFn(syncMyWallet);
-  const reprocess = useServerFn(reprocessMyWallet);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const stop = useRef(false);
 
   const q = useQuery({
     queryKey: ["wallet-activity", profileId],
     queryFn: async () => {
       const { data: w } = await supabase
-        .from("wallets").select("id,sync_status,last_synced_at,backfill_complete,sync_error")
-        .eq("profile_id", profileId).order("created_at", { ascending: false }).limit(1).maybeSingle();
+        .from("wallets")
+        .select("id,sync_status,last_synced_at,backfill_complete,sync_error,blocks_processed,last_indexed_block")
+        .eq("profile_id", profileId).eq("chain", "robinhood").eq("is_primary", true).maybeSingle();
       if (!w) return null;
-      const { count } = await supabase.from("trades").select("id", { count: "exact", head: true })
-        .eq("wallet_id", w.id).in("confidence", ["high", "medium"]);
-      const { count: txCount } = await supabase.from("transactions").select("id", { count: "exact", head: true })
-        .eq("wallet_id", w.id);
-      return { wallet: w, trades: count ?? 0, txCount: txCount ?? 0 };
+      const [{ count: txCount }, { data: rows }] = await Promise.all([
+        supabase.from("wallet_transactions").select("id", { count: "exact", head: true }).eq("wallet_id", w.id),
+        supabase.from("wallet_transactions").select("transaction_id").eq("wallet_id", w.id).limit(1000),
+      ]);
+      const ids = (rows ?? []).map((r) => r.transaction_id);
+      const { count: transfers } = ids.length
+        ? await supabase.from("token_transfers").select("id", { count: "exact", head: true }).in("transaction_id", ids)
+        : { count: 0 };
+      return { wallet: w, txCount: txCount ?? 0, transfers: transfers ?? 0 };
     },
   });
 
   if (!q.data) return null;
-  const { wallet, trades, txCount } = q.data;
+  const { wallet, txCount, transfers } = q.data;
 
   const run = async () => {
     setBusy(true);
     setError(null);
+    stop.current = false;
     try {
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 300 && !stop.current; i++) {
         const r = await sync({ data: { walletId: wallet.id } });
-        if (r.status === "failed") throw new Error(r.error ?? "Sync failed");
         await qc.invalidateQueries({ queryKey: ["wallet-activity", profileId] });
-        if (r.status === "completed" || r.processed === 0) break;
+        if (r.status === "failed") throw new Error(r.error ?? "Sync failed");
+        if (r.status === "completed") break;
       }
-      for (let i = 0; i < 20; i++) {
-        const r = await reprocess({ data: { walletId: wallet.id } });
-        if (r.remaining === 0 || r.reprocessed === 0) break;
-      }
-      await qc.invalidateQueries({ queryKey: ["wallet-activity", profileId] });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Sync failed");
     } finally {
@@ -57,27 +58,37 @@ export function WalletActivity({ profileId }: { profileId: string }) {
   const label: Record<string, string> = {
     never_synced: "Not synced yet", syncing: "Syncing", partial: "Partially synced", completed: "Up to date", failed: "Sync failed",
   };
+  const row = "flex items-center justify-between gap-3 text-sm";
 
   return (
     <div className="mt-4 space-y-3 border-t border-border pt-4">
-      <div className="flex items-center justify-between gap-3 text-sm">
+      <div className={row}>
         <span className="text-muted-foreground">Sync status</span>
         <span>{label[wallet.sync_status] ?? wallet.sync_status}</span>
       </div>
       {wallet.sync_error ? <p className="text-xs text-destructive">{wallet.sync_error}</p> : null}
-      <div className="flex items-center justify-between gap-3 text-sm">
+      <div className={row}>
         <span className="text-muted-foreground">Transactions indexed</span>
-        <span>{wallet.sync_status === "completed" && txCount === 0 ? "No wallet activity found." : txCount}</span>
+        <span>{wallet.sync_status === "completed" && txCount === 0 ? "No activity found" : txCount}</span>
       </div>
-      <div>
-        <p className="text-xs text-muted-foreground">Trading activity</p>
-        <p className="mt-1 text-sm">
-          {trades > 0 ? `${trades} verified ${trades === 1 ? "trade" : "trades"} detected` : "No verified trades detected yet."}
-        </p>
+      <div className={row}>
+        <span className="text-muted-foreground">Token transfers</span>
+        <span>{transfers}</span>
       </div>
-      <Button variant="secondary" className="w-full" disabled={busy} onClick={() => void run()}>
-        {busy ? "Syncing…" : "Sync wallet history"}
-      </Button>
+      <div className={row}>
+        <span className="text-muted-foreground">Blocks scanned</span>
+        <span>{Number(wallet.blocks_processed ?? 0).toLocaleString()}</span>
+      </div>
+      <p className="text-xs text-muted-foreground">Trading analysis will appear once trade detection for Robinhood Chain is built.</p>
+      {busy ? (
+        <Button variant="secondary" className="w-full" onClick={() => { stop.current = true; }}>
+          Syncing… tap to pause
+        </Button>
+      ) : (
+        <Button variant="secondary" className="w-full" onClick={() => void run()}>
+          {wallet.sync_status === "partial" ? "Resume sync" : "Sync wallet history"}
+        </Button>
+      )}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </div>
   );
