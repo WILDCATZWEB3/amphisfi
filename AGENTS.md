@@ -10,3 +10,6 @@
 <!-- LOVABLE:END -->
 - Trade classification lives in src/lib/solana/parser.ts; bump PARSER_VERSION on logic changes so reprocessWalletBatch re-parses older rows. Why: parser improves over time without re-linking wallets.
 - The uploaded Amphis logo is the canonical brand mark; use src/components/amphis/BrandMark.tsx and never generate or substitute a logo. Why: brand consistency.
+- Robinhood Chain (EVM, chain 4663) is the active chain: wallet connection in src/lib/evm/WalletContext.tsx (EIP-1193/6963, no wagmi), indexing in src/lib/chains/robinhood/sync.server.ts. Why: chain-specific logic stays isolated from UI.
+- Indexed chain data (evm_transactions, evm_logs, token_transfers, wallet_transactions, evm_tokens) is written only server-side; clients have read-only access. Why: browser must never write blockchain data.
+- Solana-era tables (transactions, trades, token_assets, realized_pnl, etc.) are retired, not dropped. Why: zero-downtime migration.
