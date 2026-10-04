@@ -45,8 +45,9 @@ export function WalletActivity({ profileId }: { profileId: string }) {
       for (let i = 0; i < 300 && !stop.current; i++) {
         const r = await sync({ data: { walletId: wallet.id } });
         await qc.invalidateQueries({ queryKey: ["wallet-activity", profileId] });
+        await qc.invalidateQueries({ queryKey: ["trade-performance"] });
         if (r.status === "failed") throw new Error(r.error ?? "Sync failed");
-        if (r.status === "completed") break;
+        if (r.status === "completed" && !r.pendingValuations) break;
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Sync failed");
@@ -79,7 +80,7 @@ export function WalletActivity({ profileId }: { profileId: string }) {
         <span className="text-muted-foreground">Blocks scanned</span>
         <span>{Number(wallet.blocks_processed ?? 0).toLocaleString()}</span>
       </div>
-      <p className="text-xs text-muted-foreground">Trading analysis will appear once trade detection for Robinhood Chain is built.</p>
+      <p className="text-xs text-muted-foreground">Syncing also detects swaps, prices them at trade time and updates your gains and losses on your trader page.</p>
       {busy ? (
         <Button variant="secondary" className="w-full" onClick={() => { stop.current = true; }}>
           Syncing… tap to pause
