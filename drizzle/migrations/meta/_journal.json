@@ -43,6 +43,13 @@
       "when": 1790925713163,
       "tag": "0005_robinhood_chain_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791097506774,
+      "tag": "0006_evm_trades_prices_pnl",
+      "breakpoints": true
     }
   ]
 }

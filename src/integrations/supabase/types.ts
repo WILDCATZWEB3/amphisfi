@@ -64,6 +64,215 @@ export type Database = {
           },
         ]
       }
+      evm_performance_snapshots: {
+        Row: {
+          calculated_at: string
+          closed_trade_count: number
+          data_completeness: string
+          id: string
+          losing_trades: number
+          open_cost_basis_usd: number | null
+          period: string
+          priced_trade_count: number
+          realized_pnl_usd: number | null
+          trade_count: number
+          volume_usd: number | null
+          wallet_id: string
+          win_rate: number | null
+          winning_trades: number
+        }
+        Insert: {
+          calculated_at?: string
+          closed_trade_count?: number
+          data_completeness?: string
+          id?: string
+          losing_trades?: number
+          open_cost_basis_usd?: number | null
+          period: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          trade_count?: number
+          volume_usd?: number | null
+          wallet_id: string
+          win_rate?: number | null
+          winning_trades?: number
+        }
+        Update: {
+          calculated_at?: string
+          closed_trade_count?: number
+          data_completeness?: string
+          id?: string
+          losing_trades?: number
+          open_cost_basis_usd?: number | null
+          period?: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          trade_count?: number
+          volume_usd?: number | null
+          wallet_id?: string
+          win_rate?: number | null
+          winning_trades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_performance_snapshots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evm_position_lots: {
+        Row: {
+          acquired_at: string | null
+          calculated_at: string
+          cost_basis_usd: number
+          id: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          token: string
+          wallet_id: string
+        }
+        Insert: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd: number
+          id?: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          token: string
+          wallet_id: string
+        }
+        Update: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd?: number
+          id?: string
+          quantity?: number
+          remaining_cost_basis_usd?: number
+          remaining_quantity?: number
+          source_trade_id?: string
+          token?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_position_lots_source_trade_id_fkey"
+            columns: ["source_trade_id"]
+            isOneToOne: false
+            referencedRelation: "evm_trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evm_position_lots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evm_price_snapshots: {
+        Row: {
+          chain: string
+          created_at: string
+          id: string
+          observed_ts: number | null
+          price_usd: number | null
+          requested_ts: number
+          source: string
+          status: string
+          token: string
+        }
+        Insert: {
+          chain: string
+          created_at?: string
+          id?: string
+          observed_ts?: number | null
+          price_usd?: number | null
+          requested_ts: number
+          source: string
+          status: string
+          token: string
+        }
+        Update: {
+          chain?: string
+          created_at?: string
+          id?: string
+          observed_ts?: number | null
+          price_usd?: number | null
+          requested_ts?: number
+          source?: string
+          status?: string
+          token?: string
+        }
+        Relationships: []
+      }
+      evm_realized_pnl: {
+        Row: {
+          calculated_at: string
+          cost_basis_usd: number
+          disposed_at: string | null
+          fully_matched: boolean
+          id: string
+          matched_quantity: number
+          pnl_usd: number
+          proceeds_usd: number
+          quantity: number
+          token: string
+          trade_id: string
+          wallet_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          cost_basis_usd: number
+          disposed_at?: string | null
+          fully_matched: boolean
+          id?: string
+          matched_quantity: number
+          pnl_usd: number
+          proceeds_usd: number
+          quantity: number
+          token: string
+          trade_id: string
+          wallet_id: string
+        }
+        Update: {
+          calculated_at?: string
+          cost_basis_usd?: number
+          disposed_at?: string | null
+          fully_matched?: boolean
+          id?: string
+          matched_quantity?: number
+          pnl_usd?: number
+          proceeds_usd?: number
+          quantity?: number
+          token?: string
+          trade_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_realized_pnl_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "evm_trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evm_realized_pnl_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evm_tokens: {
         Row: {
           address: string
@@ -93,6 +302,90 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      evm_trades: {
+        Row: {
+          block_time: string | null
+          bought_amount_raw: number
+          bought_decimals: number | null
+          bought_price_usd: number | null
+          bought_token: string
+          chain: string
+          created_at: string
+          id: string
+          parser_version: number
+          price_source: string | null
+          sold_amount_raw: number
+          sold_decimals: number | null
+          sold_price_usd: number | null
+          sold_token: string
+          trade_value_usd: number | null
+          transaction_hash: string
+          transaction_id: string
+          valuation_status: string
+          valued_at: string | null
+          wallet_id: string
+        }
+        Insert: {
+          block_time?: string | null
+          bought_amount_raw: number
+          bought_decimals?: number | null
+          bought_price_usd?: number | null
+          bought_token: string
+          chain?: string
+          created_at?: string
+          id?: string
+          parser_version: number
+          price_source?: string | null
+          sold_amount_raw: number
+          sold_decimals?: number | null
+          sold_price_usd?: number | null
+          sold_token: string
+          trade_value_usd?: number | null
+          transaction_hash: string
+          transaction_id: string
+          valuation_status?: string
+          valued_at?: string | null
+          wallet_id: string
+        }
+        Update: {
+          block_time?: string | null
+          bought_amount_raw?: number
+          bought_decimals?: number | null
+          bought_price_usd?: number | null
+          bought_token?: string
+          chain?: string
+          created_at?: string
+          id?: string
+          parser_version?: number
+          price_source?: string | null
+          sold_amount_raw?: number
+          sold_decimals?: number | null
+          sold_price_usd?: number | null
+          sold_token?: string
+          trade_value_usd?: number | null
+          transaction_hash?: string
+          transaction_id?: string
+          valuation_status?: string
+          valued_at?: string | null
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_trades_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evm_trades_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       evm_transactions: {
         Row: {
