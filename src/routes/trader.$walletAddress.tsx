@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Avatar } from "@/components/amphis/Avatar";
 import { Card, CardHeader } from "@/components/amphis/Card";
+import { TradePerformance } from "@/components/amphis/TradePerformance";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
 import { isEvmAddress, normalizeAddress, shortenAddress } from "@/lib/evm/address";
@@ -27,8 +28,6 @@ export const Route = createFileRoute("/trader/$walletAddress")({
 });
 
 const SECTIONS = [
-  { title: "Performance", empty: "No verified trading data yet." },
-  { title: "Trading activity", empty: "No verified trading data yet." },
   { title: "Risk", empty: "No verified trading data yet." },
   { title: "Reputation", empty: "No verified trading data yet." },
   { title: "Leaderboard position", empty: "No verified trading data yet." },
@@ -105,6 +104,7 @@ function TraderProfile() {
         </Card>
 
         <div className="grid gap-4 lg:col-span-2">
+          <TradePerformance address={walletAddress} />
           {SECTIONS.map((s) => (
             <Card key={s.title}>
               <CardHeader title={s.title} />
