@@ -35,7 +35,7 @@ export async function recalcPnl(walletId: string) {
   const { data: trades } = await db.from("evm_trades").select("*").eq("wallet_id", walletId).order("block_time", { ascending: true });
   const all = trades ?? [];
   const lots: Lot[] = [];
-  const realized: Array<Record<string, unknown>> = [];
+  const realized: Array<{ wallet_id: string; trade_id: string; token: string; disposed_at: string | null; quantity: number; matched_quantity: number; cost_basis_usd: number; proceeds_usd: number; pnl_usd: number; fully_matched: boolean }> = [];
 
   for (const t of all) {
     const value = t.trade_value_usd === null ? null : Number(t.trade_value_usd);
