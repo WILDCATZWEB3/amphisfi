@@ -19,7 +19,7 @@ export function WalletActivity({ profileId }: { profileId: string }) {
     queryFn: async () => {
       const { data: w } = await supabase
         .from("wallets")
-        .select("id,sync_status,last_synced_at,backfill_complete,sync_error,blocks_processed,last_indexed_block")
+        .select("id,sync_status,last_synced_at,backfill_complete,sync_error,blocks_processed,last_indexed_block,oldest_indexed_block")
         .eq("profile_id", profileId).eq("chain", "robinhood").eq("is_primary", true).maybeSingle();
       if (!w) return null;
       const [{ count: txCount }, { data: rows }] = await Promise.all([
@@ -77,8 +77,14 @@ export function WalletActivity({ profileId }: { profileId: string }) {
         <span>{transfers}</span>
       </div>
       <div className={row}>
-        <span className="text-muted-foreground">Blocks scanned</span>
-        <span>{Number(wallet.blocks_processed ?? 0).toLocaleString()}</span>
+        <span className="text-muted-foreground">Coverage</span>
+        <span className="text-right">
+          {wallet.last_indexed_block === null ? "—" : `Block ${Number(wallet.oldest_indexed_block ?? 0).toLocaleString()} → ${Number(wallet.last_indexed_block).toLocaleString()}`}
+        </span>
+      </div>
+      <div className={row}>
+        <span className="text-muted-foreground">Last synced</span>
+        <span>{wallet.last_synced_at ? new Date(wallet.last_synced_at).toLocaleString() : "Never"}</span>
       </div>
       <p className="text-xs text-muted-foreground">Syncing also detects swaps, prices them at trade time and updates your gains and losses on your trader page.</p>
       {busy ? (

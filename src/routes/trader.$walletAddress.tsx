@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Avatar } from "@/components/amphis/Avatar";
 import { Card, CardHeader } from "@/components/amphis/Card";
 import { TradePerformance } from "@/components/amphis/TradePerformance";
+import { IndexingStatus } from "@/components/amphis/IndexingStatus";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
 import { isEvmAddress, normalizeAddress, shortenAddress } from "@/lib/evm/address";
@@ -104,6 +105,7 @@ function TraderProfile() {
         </Card>
 
         <div className="grid gap-4 lg:col-span-2">
+          <IndexingStatus address={walletAddress} />
           <TradePerformance address={walletAddress} />
           {SECTIONS.map((s) => (
             <Card key={s.title}>
