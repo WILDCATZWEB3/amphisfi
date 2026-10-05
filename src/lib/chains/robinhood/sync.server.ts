@@ -74,12 +74,21 @@ export async function syncRobinhoodWallet(walletId: string): Promise<SyncResult>
       }
     };
 
-    // Forward (new blocks), then backfill (older history), within the time budget.
-    while (forward < head && Date.now() - started < TIME_BUDGET_MS && hashes.size < MAX_TX_PER_BATCH) {
+    // Preferred: Alchemy asset-transfer index (full history incl. native ETH, paginated).
+    // Cursor = highest block whose transfers are fully discovered; resumes from there.
+    const alchemy = await discoverViaAlchemy(c, addr, w.backfill_complete ? (w.last_indexed_block ?? -1) : -1, head, hashes);
+    if (alchemy) {
+      forward = alchemy.cursor;
+      backward = 0;
+      scanned += alchemy.scanned;
+      if (forward >= head) w.backfill_complete = true;
+    }
+    // Fallback (plain RPC): Transfer-log scans. Forward (new blocks), then backfill.
+    while (!alchemy && forward < head && Date.now() - started < TIME_BUDGET_MS && hashes.size < MAX_TX_PER_BATCH) {
       const from = forward + 1, to = Math.min(head, forward + window);
       if (await withRange(() => scan(from, to))) forward = to;
     }
-    while (!w.backfill_complete && backward > 0 && Date.now() - started < TIME_BUDGET_MS && hashes.size < MAX_TX_PER_BATCH) {
+    while (!alchemy && !w.backfill_complete && backward > 0 && Date.now() - started < TIME_BUDGET_MS && hashes.size < MAX_TX_PER_BATCH) {
       const to = backward - 1, from = Math.max(0, backward - window);
       if (await withRange(() => scan(from, to))) backward = from;
     }
@@ -105,6 +114,44 @@ export async function syncRobinhoodWallet(walletId: string): Promise<SyncResult>
     log("failed", { walletId, raw: raw.slice(0, 500) });
     return { status: "failed", processed: 0, stored: 0, blocksScanned: 0, error: message };
   }
+}
+
+type AssetTransfer = { blockNum: string; hash: string };
+
+/**
+ * Discovers wallet transactions with alchemy_getAssetTransfers (sent + received,
+ * ascending, one page each). Returns null when the provider lacks this method.
+ */
+async function discoverViaAlchemy(
+  c: ReturnType<typeof client>, addr: string, cursor: number, head: number, hashes: Map<string, number>,
+): Promise<{ cursor: number; scanned: number } | null> {
+  if (cursor >= head) return { cursor: head, scanned: 0 };
+  const base = {
+    fromBlock: `0x${(cursor + 1).toString(16)}`, toBlock: `0x${head.toString(16)}`, order: "asc",
+    category: ["external", "erc20", "erc721", "erc1155"], withMetadata: false, excludeZeroValue: false, maxCount: "0x19",
+  };
+  const page = (dir: "fromAddress" | "toAddress") =>
+    c.request({ method: "alchemy_getAssetTransfers" as never, params: [{ ...base, [dir]: addr }] as never }) as Promise<{ transfers: AssetTransfer[]; pageKey?: string }>;
+  let out, inn;
+  try {
+    [out, inn] = await Promise.all([page("fromAddress"), page("toAddress")]);
+  } catch (e) {
+    const m = e instanceof Error ? e.message : "";
+    if (/method.*(not|unsupported)|does not exist|not available/i.test(m)) return null;
+    throw e;
+  }
+  let next = head;
+  for (const r of [out, inn]) {
+    for (const t of r.transfers) hashes.set(t.hash, parseInt(t.blockNum, 16));
+    if (r.pageKey && r.transfers.length) {
+      // Everything below the last returned block is complete for this direction.
+      const last = parseInt(r.transfers[r.transfers.length - 1]!.blockNum, 16);
+      next = Math.min(next, last - 1 > cursor ? last - 1 : last);
+    }
+  }
+  // Only keep transactions inside the fully-covered range; the rest come next batch.
+  for (const [h, b] of hashes) if (b > next) hashes.delete(h);
+  return { cursor: next, scanned: next - cursor };
 }
 
 const blockTimes = new Map<bigint, string>();

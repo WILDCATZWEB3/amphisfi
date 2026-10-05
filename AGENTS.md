@@ -13,3 +13,4 @@
 - Robinhood Chain (EVM, chain 4663) is the active chain: wallet connection in src/lib/evm/WalletContext.tsx (EIP-1193/6963, no wagmi), indexing in src/lib/chains/robinhood/sync.server.ts. Why: chain-specific logic stays isolated from UI.
 - Indexed chain data (evm_transactions, evm_logs, token_transfers, wallet_transactions, evm_tokens) is written only server-side; clients have read-only access. Why: browser must never write blockchain data.
 - Solana-era tables (transactions, trades, token_assets, realized_pnl, etc.) are retired, not dropped. Why: zero-downtime migration.
+- Robinhood wallet discovery uses alchemy_getAssetTransfers (ascending, paginated, block cursor) with Transfer-log scanning as fallback. Why: covers native ETH and full history in few requests.
