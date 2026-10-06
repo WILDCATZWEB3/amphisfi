@@ -100,7 +100,7 @@ export async function recalcPnl(walletId: string) {
     const wins = closed.filter((r) => Number(r.pnl_usd) > 0).length;
     const losses = closed.filter((r) => Number(r.pnl_usd) < 0).length;
     const completeness = !priced.length ? "insufficient"
-      : priced.length === ts.length && closed.length === rs.length ? "complete" : "partial";
+      : priced.length === ts.length && closed.length === rs.length && !(unclassified ?? 0) ? "complete" : "partial";
     return {
       wallet_id: walletId, period,
       realized_pnl_usd: rs.length ? rs.reduce((s, r) => s + Number(r.pnl_usd), 0) : null,
