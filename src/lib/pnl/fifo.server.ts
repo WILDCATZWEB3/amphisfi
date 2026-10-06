@@ -3,7 +3,7 @@
  * realized PnL and 7D/30D/All Time snapshots from priced trades only.
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { historicalPrices } from "@/lib/prices/defillama.server";
+import { currentPrices, historicalPrices } from "@/lib/prices/defillama.server";
 
 const units = (raw: unknown, dec: number | null) => (dec === null ? null : Number(String(raw)) / 10 ** dec);
 
@@ -77,6 +77,17 @@ export async function recalcPnl(walletId: string) {
     })));
   }
 
+  // Unrealized: only when every open token has a reliable current price.
+  const openTokens = [...new Set(open.map((l) => l.token))];
+  const cur = await currentPrices(openTokens);
+  const allPriced = openTokens.every((t) => cur.get(t) !== null);
+  const marketValue = open.length && allPriced ? open.reduce((s, l) => s + l.remaining * (cur.get(l.token) as number), 0) : null;
+  const openCost = open.reduce((s, l) => s + l.remainingCost, 0);
+  const unrealized = marketValue === null ? null : marketValue - openCost;
+  const { count: unclassified } = await db.from("wallet_transactions").select("id", { count: "exact", head: true })
+    .eq("wallet_id", walletId).eq("classification", "unclassified");
+  const { data: w } = await db.from("wallets").select("sync_status").eq("id", walletId).single();
+
   const now = Date.now();
   const periods: Array<[string, number | null]> = [["7d", 7], ["30d", 30], ["all", null]];
   const snaps = periods.map(([period, days]) => {
@@ -97,6 +108,26 @@ export async function recalcPnl(walletId: string) {
       trade_count: ts.length, priced_trade_count: priced.length, closed_trade_count: closed.length,
       winning_trades: wins, losing_trades: losses, win_rate: closed.length ? wins / closed.length : null,
       open_cost_basis_usd: days === null && open.length ? open.reduce((s, l) => s + l.remainingCost, 0) : null,
+      ...(() => {
+        const realizedSum = rs.length ? rs.reduce((s, r) => s + Number(r.pnl_usd), 0) : null;
+        const allTime = days === null;
+        const unr = allTime ? (open.length ? unrealized : 0) : null;
+        const total = realizedSum !== null && unr !== null && completeness === "complete" ? realizedSum + unr : null;
+        const deployed = priced.filter((t) => t.direction === "BUY").reduce((s, t) => s + Number(t.trade_value_usd), 0);
+        const pnls = closed.map((r) => Number(r.pnl_usd));
+        return {
+          unrealized_pnl_usd: allTime ? unrealized : null,
+          open_market_value_usd: allTime ? marketValue : null,
+          total_pnl_usd: total,
+          capital_deployed_usd: deployed > 0 ? deployed : null,
+          roi: total !== null && deployed > 0 ? total / deployed : null,
+          average_trade_usd: priced.length ? priced.reduce((s, t) => s + Number(t.trade_value_usd), 0) / priced.length : null,
+          best_trade_pnl_usd: pnls.length ? Math.max(...pnls) : null,
+          worst_trade_pnl_usd: pnls.length ? Math.min(...pnls) : null,
+          unclassified_tx_count: unclassified ?? 0,
+          performance_ready: w?.sync_status === "completed" && completeness === "complete",
+        };
+      })(),
       data_completeness: completeness, calculated_at: new Date().toISOString(),
     };
   });
