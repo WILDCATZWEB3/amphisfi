@@ -100,6 +100,7 @@ export async function detectTrades(walletId: string, wallet: string) {
     }
     for (const c of ["trade", "unclassified", "transfer"]) {
       const these = classes.filter((x) => x.c === c).map((x) => x.id);
+      if (these.length && c !== "trade") await db.from("evm_trades").delete().eq("wallet_id", walletId).in("transaction_id", these);
       if (these.length) await db.from("wallet_transactions").update({ classification: c }).eq("wallet_id", walletId).in("transaction_id", these);
     }
   }

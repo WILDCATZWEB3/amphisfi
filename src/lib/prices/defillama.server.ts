@@ -32,3 +32,17 @@ export async function historicalPrices(tokens: string[], unixTs: number): Promis
   await supabaseAdmin.from("evm_price_snapshots").upsert(rows, { onConflict: "chain,token,requested_ts", ignoreDuplicates: true });
   return out;
 }
+
+/** Current USD prices (not cached; used only for open-position valuation). Missing stay null. */
+export async function currentPrices(tokens: string[]): Promise<Map<string, number | null>> {
+  const out = new Map<string, number | null>(tokens.map((t) => [t, null]));
+  if (!tokens.length) return out;
+  const res = await fetch(`https://coins.llama.fi/prices/current/${tokens.map((t) => `${SLUG}:${t}`).join(",")}?searchWidth=4h`);
+  if (!res.ok) return out;
+  const body = (await res.json()) as { coins?: Record<string, { price: number }> };
+  for (const t of tokens) {
+    const hit = body.coins?.[`${SLUG}:${t}`];
+    if (hit && Number.isFinite(hit.price)) out.set(t, hit.price);
+  }
+  return out;
+}
