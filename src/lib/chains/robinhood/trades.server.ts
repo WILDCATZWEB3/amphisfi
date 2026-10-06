@@ -59,7 +59,7 @@ export async function detectTrades(walletId: string, wallet: string) {
 
     const rows = [];
     const classes: Array<{ id: string; c: string }> = [];
-    for (const tx of (txs ?? []) as unknown as Array<Record<string, string>>) {
+    for (const tx of (txs ?? []) as unknown as Array<{ id: string; hash: string; block_number: string; block_time: string | null; from_address: string; to_address: string | null; status: string; value_wei: string; gas_used: string | null; effective_gas_price_wei: string | null }>) {
       const tt = (transfers ?? []).filter((x) => x.transaction_id === tx.id && x.standard === "erc20");
       const net = new Map<string, bigint>();
       const add = (k: string, v: bigint) => net.set(k, (net.get(k) ?? 0n) + v);
@@ -73,14 +73,14 @@ export async function detectTrades(walletId: string, wallet: string) {
       const ins = [...net].filter(([, v]) => v > 0n);
       const initiated = tx.from_address === wallet;
       if (tx.status !== "success" || !initiated || outs.length !== 1 || ins.length !== 1) {
-        classes.push({ id: tx.id!, c: !initiated || !tt.length ? "transfer" : "unclassified" });
+        classes.push({ id: tx.id, c: !initiated || !tt.length ? "transfer" : "unclassified" });
         continue;
       }
       const [sold, soldAmt] = outs[0]!;
       const [bought, boughtAmt] = ins[0]!;
       const topics = (logs ?? []).filter((l) => l.transaction_id === tx.id).map((l) => l.topic0 ?? "");
       const protocol = topics.map((t) => SWAP_TOPICS[t]).find(Boolean) ?? null;
-      classes.push({ id: tx.id!, c: "trade" });
+      classes.push({ id: tx.id, c: "trade" });
       rows.push({
         chain: "robinhood", wallet_id: walletId, transaction_id: tx.id, transaction_hash: tx.hash, block_time: tx.block_time,
         block_number: Number(tx.block_number), router_address: tx.to_address, protocol,
