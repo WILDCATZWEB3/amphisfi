@@ -6,6 +6,7 @@ import { EmptyState, LoadingState } from "@/components/amphis/States";
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeAddress, shortenAddress } from "@/lib/evm/address";
 import { cn } from "@/lib/utils";
+import { ROBINHOOD_EXPLORER } from "@/lib/chains/robinhood/config";
 
 const NATIVE = "0x0000000000000000000000000000000000000000";
 const usd = (v: unknown) =>
@@ -87,10 +88,26 @@ export function TradePerformance({ address }: { address: string }) {
                 <p className="mt-1 font-medium">{s.win_rate === null ? "—" : `${Math.round(Number(s.win_rate) * 100)}%`}</p></div>
               <div className={stat}><p className="text-xs text-muted-foreground">Trades priced</p><p className="mt-1 font-medium">{s.priced_trade_count} / {s.trade_count}</p></div>
             </div>
-            {period === "all" && s.open_cost_basis_usd !== null ? (
-              <p className="mt-3 text-sm text-muted-foreground">Open positions cost basis: <span className="text-foreground">{usd(s.open_cost_basis_usd)}</span></p>
-            ) : null}
-            <p className="mt-3 text-xs text-muted-foreground">{COMPLETENESS[s.data_completeness] ?? s.data_completeness}. Prices: DefiLlama at trade time. Cost basis: first in, first out.</p>
+            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-3">
+              {([
+                ["Unrealized P/L", period === "all" ? (s.open_cost_basis_usd === null ? "No open positions" : s.unrealized_pnl_usd === null ? "Valuation unavailable" : signed(s.unrealized_pnl_usd)) : null],
+                ["Total P/L", s.total_pnl_usd === null ? "Incomplete data" : signed(s.total_pnl_usd)],
+                ["ROI", s.roi === null ? "—" : `${(Number(s.roi) * 100).toFixed(1)}%`],
+                ["Open cost basis", period === "all" ? usd(s.open_cost_basis_usd) : null],
+                ["Capital deployed", usd(s.capital_deployed_usd)],
+                ["Avg trade", usd(s.average_trade_usd)],
+                ["Best trade", signed(s.best_trade_pnl_usd)],
+                ["Worst trade", signed(s.worst_trade_pnl_usd)],
+                ["Unclassified txs", period === "all" ? String(s.unclassified_tx_count ?? 0) : null],
+              ] as const).filter(([, v]) => v !== null).map(([k, v]) => (
+                <p key={k} className="flex justify-between gap-2"><span className="text-muted-foreground">{k}</span><span>{v}</span></p>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {s.performance_ready ? "Performance ready." : COMPLETENESS[s.data_completeness] ?? s.data_completeness}
+              {(s.unclassified_tx_count ?? 0) > 0 ? " Some transactions could not be classified (e.g. sales paid out in ETH by a contract), so results may be incomplete." : ""}
+              {" "}Prices: DefiLlama at trade time. Cost basis: first in, first out.
+            </p>
           </>
         ) : (
           <p className="text-sm text-muted-foreground">Performance has not been calculated yet.</p>
@@ -108,7 +125,10 @@ export function TradePerformance({ address }: { address: string }) {
                   <p className="truncate">
                     {amount(t.sold_amount_raw, t.sold_decimals)} {sym(t.sold_token)} → {amount(t.bought_amount_raw, t.bought_decimals)} {sym(t.bought_token)}
                   </p>
-                  <p className="text-xs text-muted-foreground">{t.block_time ? new Date(t.block_time).toLocaleString() : "Unknown time"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t.direction ?? "SWAP"} · {t.block_time ? new Date(t.block_time).toLocaleString() : "Unknown time"}
+                    {" · "}<a className="underline" href={`${ROBINHOOD_EXPLORER}/tx/${t.transaction_hash}`} target="_blank" rel="noreferrer">tx</a>
+                  </p>
                 </div>
                 <div className="text-right">
                   <p>{t.valuation_status === "priced" ? usd(t.trade_value_usd) : t.valuation_status === "pending" ? "Pricing…" : "Price unavailable"}</p>
