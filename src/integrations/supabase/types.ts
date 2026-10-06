@@ -66,52 +66,82 @@ export type Database = {
       }
       evm_performance_snapshots: {
         Row: {
+          average_trade_usd: number | null
+          best_trade_pnl_usd: number | null
           calculated_at: string
+          capital_deployed_usd: number | null
           closed_trade_count: number
           data_completeness: string
           id: string
           losing_trades: number
           open_cost_basis_usd: number | null
+          open_market_value_usd: number | null
+          performance_ready: boolean
           period: string
           priced_trade_count: number
           realized_pnl_usd: number | null
+          roi: number | null
+          total_pnl_usd: number | null
           trade_count: number
+          unclassified_tx_count: number | null
+          unrealized_pnl_usd: number | null
           volume_usd: number | null
           wallet_id: string
           win_rate: number | null
           winning_trades: number
+          worst_trade_pnl_usd: number | null
         }
         Insert: {
+          average_trade_usd?: number | null
+          best_trade_pnl_usd?: number | null
           calculated_at?: string
+          capital_deployed_usd?: number | null
           closed_trade_count?: number
           data_completeness?: string
           id?: string
           losing_trades?: number
           open_cost_basis_usd?: number | null
+          open_market_value_usd?: number | null
+          performance_ready?: boolean
           period: string
           priced_trade_count?: number
           realized_pnl_usd?: number | null
+          roi?: number | null
+          total_pnl_usd?: number | null
           trade_count?: number
+          unclassified_tx_count?: number | null
+          unrealized_pnl_usd?: number | null
           volume_usd?: number | null
           wallet_id: string
           win_rate?: number | null
           winning_trades?: number
+          worst_trade_pnl_usd?: number | null
         }
         Update: {
+          average_trade_usd?: number | null
+          best_trade_pnl_usd?: number | null
           calculated_at?: string
+          capital_deployed_usd?: number | null
           closed_trade_count?: number
           data_completeness?: string
           id?: string
           losing_trades?: number
           open_cost_basis_usd?: number | null
+          open_market_value_usd?: number | null
+          performance_ready?: boolean
           period?: string
           priced_trade_count?: number
           realized_pnl_usd?: number | null
+          roi?: number | null
+          total_pnl_usd?: number | null
           trade_count?: number
+          unclassified_tx_count?: number | null
+          unrealized_pnl_usd?: number | null
           volume_usd?: number | null
           wallet_id?: string
           win_rate?: number | null
           winning_trades?: number
+          worst_trade_pnl_usd?: number | null
         }
         Relationships: [
           {
@@ -305,16 +335,23 @@ export type Database = {
       }
       evm_trades: {
         Row: {
+          block_number: number | null
           block_time: string | null
           bought_amount_raw: number
           bought_decimals: number | null
           bought_price_usd: number | null
           bought_token: string
           chain: string
+          confidence: string | null
           created_at: string
+          detection_source: string | null
+          direction: string | null
+          gas_fee_wei: number | null
           id: string
           parser_version: number
           price_source: string | null
+          protocol: string | null
+          router_address: string | null
           sold_amount_raw: number
           sold_decimals: number | null
           sold_price_usd: number | null
@@ -327,16 +364,23 @@ export type Database = {
           wallet_id: string
         }
         Insert: {
+          block_number?: number | null
           block_time?: string | null
           bought_amount_raw: number
           bought_decimals?: number | null
           bought_price_usd?: number | null
           bought_token: string
           chain?: string
+          confidence?: string | null
           created_at?: string
+          detection_source?: string | null
+          direction?: string | null
+          gas_fee_wei?: number | null
           id?: string
           parser_version: number
           price_source?: string | null
+          protocol?: string | null
+          router_address?: string | null
           sold_amount_raw: number
           sold_decimals?: number | null
           sold_price_usd?: number | null
@@ -349,16 +393,23 @@ export type Database = {
           wallet_id: string
         }
         Update: {
+          block_number?: number | null
           block_time?: string | null
           bought_amount_raw?: number
           bought_decimals?: number | null
           bought_price_usd?: number | null
           bought_token?: string
           chain?: string
+          confidence?: string | null
           created_at?: string
+          detection_source?: string | null
+          direction?: string | null
+          gas_fee_wei?: number | null
           id?: string
           parser_version?: number
           price_source?: string | null
+          protocol?: string | null
+          router_address?: string | null
           sold_amount_raw?: number
           sold_decimals?: number | null
           sold_price_usd?: number | null
@@ -992,6 +1043,7 @@ export type Database = {
       wallet_transactions: {
         Row: {
           block_number: number
+          classification: string | null
           created_at: string
           id: string
           role: string
@@ -1000,6 +1052,7 @@ export type Database = {
         }
         Insert: {
           block_number: number
+          classification?: string | null
           created_at?: string
           id?: string
           role: string
@@ -1008,6 +1061,7 @@ export type Database = {
         }
         Update: {
           block_number?: number
+          classification?: string | null
           created_at?: string
           id?: string
           role?: string
