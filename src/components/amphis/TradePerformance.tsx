@@ -88,7 +88,7 @@ export function TradePerformance({ address }: { address: string }) {
                 <p className="mt-1 font-medium">{s.win_rate === null ? "—" : `${Math.round(Number(s.win_rate) * 100)}%`}</p></div>
               <div className={stat}><p className="text-xs text-muted-foreground">Trades priced</p><p className="mt-1 font-medium">{s.priced_trade_count} / {s.trade_count}</p></div>
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-3">
+            <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
               {([
                 ["Unrealized P/L", period === "all" ? (s.open_cost_basis_usd === null ? "No open positions" : s.unrealized_pnl_usd === null ? "Valuation unavailable" : signed(s.unrealized_pnl_usd)) : null],
                 ["Total P/L", s.total_pnl_usd === null ? "Incomplete data" : signed(s.total_pnl_usd)],
@@ -104,7 +104,7 @@ export function TradePerformance({ address }: { address: string }) {
               ))}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              {s.performance_ready ? "Performance ready." : COMPLETENESS[s.data_completeness] ?? s.data_completeness}
+              {s.performance_ready ? "Performance ready." : `${COMPLETENESS[s.data_completeness] ?? s.data_completeness}.`}
               {(s.unclassified_tx_count ?? 0) > 0 ? " Some transactions could not be classified (e.g. sales paid out in ETH by a contract), so results may be incomplete." : ""}
               {" "}Prices: DefiLlama at trade time. Cost basis: first in, first out.
             </p>
