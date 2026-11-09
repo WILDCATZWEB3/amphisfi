@@ -44,7 +44,23 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
-async function healthResponse(): Promise<Response> {
+async function healthResponse(request: Request): Promise<Response> {
+  const { clientKeyFromRequest, rateLimit } = await import("./lib/rate-limit/memory");
+  const rl = rateLimit({
+    key: clientKeyFromRequest(request, "health"),
+    limit: Number(process.env["PUBLIC_API_RATE_LIMIT"] ?? 120),
+    windowMs: Number(process.env["PUBLIC_API_RATE_WINDOW_MS"] ?? 60_000),
+  });
+  if (!rl.allowed) {
+    return new Response(JSON.stringify({ ok: false, error: "rate_limited" }), {
+      status: 429,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "retry-after": String(rl.retryAfterSec),
+        "cache-control": "no-store",
+      },
+    });
+  }
   const body: Record<string, unknown> = {
     ok: true,
     service: "amphis",
@@ -52,21 +68,21 @@ async function healthResponse(): Promise<Response> {
   };
   try {
     const { rpcConfigStatus, getLatestBlockNumber } = await import("./lib/rpc/provider.server");
-    body.rpc = rpcConfigStatus();
+    body["rpc"] = rpcConfigStatus();
     const block = await getLatestBlockNumber();
-    body.chain = block.ok
+    body["chain"] = block.ok
       ? { reachable: true, blockNumber: block.blockNumber, provider: block.provider }
       : { reachable: false, reason: block.reason };
-    if (!block.ok) body.ok = false;
+    if (!block.ok) body["ok"] = false;
   } catch (e) {
-    body.ok = false;
-    body.chain = {
+    body["ok"] = false;
+    body["chain"] = {
       reachable: false,
       reason: e instanceof Error ? e.message : "health check failed",
     };
   }
   return new Response(JSON.stringify(body), {
-    status: body.ok ? 200 : 503,
+    status: body["ok"] ? 200 : 503,
     headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
   });
 }
@@ -75,7 +91,7 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const path = new URL(request.url).pathname;
     if (path === "/api/health" || path === "/healthz") {
-      return healthResponse();
+      return healthResponse(request);
     }
     try {
       const handler = await getServerEntry();

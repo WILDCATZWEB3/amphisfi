@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { isEvmAddress, normalizeAddress } from "@/lib/evm/address";
+import { publicRateLimit } from "@/lib/rate-limit/public-middleware";
 
 const QuerySchema = z.object({
   q: z.string().trim().min(1).max(128),
@@ -31,6 +32,7 @@ export type SearchHit =
     };
 
 export const searchAmphis = createServerFn({ method: "GET" })
+  .middleware([publicRateLimit])
   .inputValidator((d: unknown) => QuerySchema.parse(d))
   .handler(async ({ data }) => {
     const page = data.page ?? 1;
