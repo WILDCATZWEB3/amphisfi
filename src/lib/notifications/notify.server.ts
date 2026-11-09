@@ -2,7 +2,7 @@
 
 export type NotifyInput = {
   profileId: string;
-  type: "new_follower" | "wallet_sync_complete" | "wallet_sync_failure";
+  type: "new_follower" | "wallet_sync_complete" | "wallet_sync_failure" | "price_alert";
   title: string;
   body: string;
   dedupeKey: string;
@@ -20,7 +20,7 @@ export async function notifyIfEnabled(input: NotifyInput): Promise<boolean> {
 
   const enabled =
     !prefs ||
-    (input.type === "new_follower" ? prefs.follows !== false : prefs.wallet_sync !== false);
+    (input.type === "new_follower" ? prefs.follows !== false : prefs.wallet_sync !== false); // price_alert + sync share wallet_sync preference until a dedicated column exists
   if (!enabled) return false;
 
   const { error } = await supabaseAdmin.from("notifications").insert({

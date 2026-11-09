@@ -53,6 +53,7 @@ type WalletRow = {
   sync_status: string;
   backfill_complete: boolean;
   ownership_verified: boolean;
+  public_contribute: boolean;
   profile_id: string;
   profiles: {
     id: string;
@@ -129,7 +130,7 @@ export async function loadPeriodTraders(period: DiscoveryPeriod): Promise<{
   const { data: wallets, error: wErr } = await supabaseAdmin
     .from("wallets")
     .select(
-      "id,address,address_normalized,sync_status,backfill_complete,ownership_verified,profile_id,profiles(id,username,avatar_url,visibility)",
+      "id,address,address_normalized,sync_status,backfill_complete,ownership_verified,public_contribute,profile_id,profiles(id,username,avatar_url,visibility)",
     )
     .eq("chain", "robinhood")
     .in("id", walletIds);
@@ -137,6 +138,8 @@ export async function loadPeriodTraders(period: DiscoveryPeriod): Promise<{
 
   const walletsById = new Map<string, WalletRow>();
   for (const w of (wallets ?? []) as unknown as WalletRow[]) {
+    // Opt-out of public contribution: exclude from explore/leaderboard.
+    if (w.public_contribute === false) continue;
     // Private profiles: still allow wallet pages, but hide username/avatar in discovery.
     if (w.profiles && w.profiles.visibility === "private") {
       w.profiles = { ...w.profiles, username: null, avatar_url: null };
