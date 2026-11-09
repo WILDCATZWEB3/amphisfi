@@ -19,16 +19,43 @@ export const syncMyWallet = createServerFn({ method: "POST" })
     if (!wallet) throw new Error("This wallet is not linked to your account.");
     const { syncRobinhoodWallet } = await import("@/lib/chains/robinhood/sync.server");
     const result = await syncRobinhoodWallet(wallet.id);
-    if (result.status === "failed") return { ...result, pendingValuations: 0 };
+    const { notifyIfEnabled } = await import("@/lib/notifications/notify.server");
+    if (result.status === "failed") {
+      await notifyIfEnabled({
+        profileId: profile.id,
+        type: "wallet_sync_failure",
+        title: "Wallet sync failed",
+        body: result.error ?? "Robinhood Chain sync failed. Try again shortly.",
+        dedupeKey: `sync_fail:${wallet.id}:${result.error ?? "unknown"}`,
+        payload: { walletId: wallet.id },
+      });
+      return { ...result, pendingValuations: 0 };
+    }
     try {
       const { detectTrades } = await import("@/lib/chains/robinhood/trades.server");
       const { valueTrades, recalcPnl } = await import("@/lib/pnl/fifo.server");
       await detectTrades(wallet.id, (wallet.address_normalized ?? wallet.address).toLowerCase());
       const pendingValuations = await valueTrades(wallet.id);
       await recalcPnl(wallet.id);
+      await notifyIfEnabled({
+        profileId: profile.id,
+        type: "wallet_sync_complete",
+        title: "Wallet sync complete",
+        body: "Your Robinhood Chain wallet finished this sync batch.",
+        dedupeKey: `sync_ok:${wallet.id}:${result.status}:${pendingValuations}`,
+        payload: { walletId: wallet.id, status: result.status, pendingValuations },
+      });
       return { ...result, pendingValuations };
     } catch (e) {
       console.log("[pnl] failed", e instanceof Error ? e.message : e);
+      await notifyIfEnabled({
+        profileId: profile.id,
+        type: "wallet_sync_failure",
+        title: "Trade pricing failed",
+        body: "Sync stored chain data but pricing/PnL failed. Try again shortly.",
+        dedupeKey: `pnl_fail:${wallet.id}`,
+        payload: { walletId: wallet.id },
+      });
       return { ...result, status: "failed" as const, error: "Trade pricing failed. Try again shortly.", pendingValuations: 0 };
     }
   });

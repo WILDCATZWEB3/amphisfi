@@ -55,12 +55,13 @@ export const followProfile = createServerFn({ method: "POST" })
     }
 
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.from("notifications").insert({
-        profile_id: data.profileId,
+      const { notifyIfEnabled } = await import("@/lib/notifications/notify.server");
+      await notifyIfEnabled({
+        profileId: data.profileId,
         type: "new_follower",
         title: "New follower",
         body: "Someone followed your public Amphis profile.",
+        dedupeKey: `follow:${followerId}:${data.profileId}`,
         payload: { followerProfileId: followerId },
       });
     } catch {
