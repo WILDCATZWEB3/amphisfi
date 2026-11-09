@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Card, CardHeader } from "@/components/amphis/Card";
 import { PageHeader } from "@/components/amphis/PageHeader";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
+import { PerformanceCharts } from "@/components/amphis/PerformanceCharts";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { getWalletPortfolio, listMyWallets } from "@/lib/portfolio/portfolio.functions";
 import { ROBINHOOD_EXPLORER } from "@/lib/chains/robinhood/config";
@@ -114,8 +115,9 @@ function PortfolioPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     ETH balance:{" "}
                     {portQ.data.ethBalanceAvailable && portQ.data.ethBalance !== null
-                      ? portQ.data.ethBalance
-                      : "Unavailable (not stored; not invented)"}
+                      ? `${portQ.data.ethBalance} ETH`
+                      : `Unavailable${portQ.data.ethBalanceReason ? ` (${portQ.data.ethBalanceReason})` : ""}`}
+                    {portQ.data.ethBalanceProvider ? ` · via ${portQ.data.ethBalanceProvider}` : ""}
                   </p>
                 </Card>
 
@@ -155,6 +157,8 @@ function PortfolioPage() {
                       : "—"}
                   </p>
                 </Card>
+
+                <PerformanceCharts walletId={walletId} />
 
                 <Card>
                   <CardHeader title="Open positions (from lots)" />

@@ -60,3 +60,13 @@ Next.js monorepo, Railway multi-service deploy, reputation engine, watchlist UI,
 | Reputation v1        | `reputation/score.ts`, `ReputationCard`, tests                                          |
 | Legal                | `/about`, `/privacy`, `/terms`; footer links                                            |
 | Migration 0009       | notification_preferences, reputation_snapshots, dedupe index                            |
+
+## Phase 3 additions
+
+| Feature                 | Artifacts                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| Following activity feed | `/activity` Following tab, `following-activity.functions.ts`                  |
+| Live ETH balance        | `rpc/provider.server.ts`, portfolio wiring                                    |
+| Real-data charts        | `charts/series.ts`, `PerformanceCharts`, chart-data server fn                 |
+| Alert definitions       | migration 0010, `/alerts`, on-read wallet-activity eval; price alerts blocked |
+| Health + Railway docs   | `/api/health`, `railway.toml`, `docs/DEPLOYMENT.md`                           |

@@ -1,0 +1,17 @@
+# Amphis Railway deployment sketch — NOT claimed live.
+# Apply after connecting this GitHub repo in Railway. See docs/DEPLOYMENT.md.
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "bun install --frozen-lockfile && bun run build"
+
+[deploy]
+startCommand = "bun run preview --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+
+# Planned services (Phase 4+):
+# - web: this startCommand
+# - worker: separate service running durable sync/price/alert jobs (not implemented here)
+# - Postgres: Railway PostgreSQL (currently Lovable Cloud / Supabase)
