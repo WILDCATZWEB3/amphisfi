@@ -48,3 +48,15 @@ Decision: extend the existing TanStack Start + Lovable Cloud app in place. Do **
 ## Explicitly not done in Phase 1 (see register)
 
 Next.js monorepo, Railway multi-service deploy, reputation engine, watchlist UI, alerts worker, admin console, protocol registry UI, chart suite, email notifications, ownership of Redis/workers split, live production verification.
+
+## Phase 2 additions
+
+| Feature              | Artifacts                                                                               |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| Watchlist UI/API     | `/watchlist`, `watchlist.functions.ts`                                                  |
+| Notifications UI/API | `/notifications`, `notifications.functions.ts`, `notify.server.ts`; sync + follow hooks |
+| Portfolio            | `/portfolio`, `portfolio.functions.ts` (explicit wallet)                                |
+| Activity             | `/activity`                                                                             |
+| Reputation v1        | `reputation/score.ts`, `ReputationCard`, tests                                          |
+| Legal                | `/about`, `/privacy`, `/terms`; footer links                                            |
+| Migration 0009       | notification_preferences, reputation_snapshots, dedupe index                            |
