@@ -71,6 +71,13 @@
       "when": 1794249711126,
       "tag": "0009_notifications_reputation",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794250887512,
+      "tag": "0010_alert_definitions",
+      "breakpoints": true
     }
   ]
 }

@@ -1082,6 +1082,57 @@ export type Database = {
           },
         ];
       };
+      alert_definitions: {
+        Row: {
+          chain: string | null
+          created_at: string
+          direction: string | null
+          enabled: boolean
+          id: string
+          kind: string
+          label: string | null
+          last_evaluated_at: string | null
+          last_triggered_at: string | null
+          profile_id: string
+          target_price_usd: number | null
+          token_address: string | null
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          chain?: string | null
+          created_at?: string
+          direction?: string | null
+          enabled?: boolean
+          id?: string
+          kind: string
+          label?: string | null
+          last_evaluated_at?: string | null
+          last_triggered_at?: string | null
+          profile_id: string
+          target_price_usd?: number | null
+          token_address?: string | null
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          chain?: string | null
+          created_at?: string
+          direction?: string | null
+          enabled?: boolean
+          id?: string
+          kind?: string
+          label?: string | null
+          last_evaluated_at?: string | null
+          last_triggered_at?: string | null
+          profile_id?: string
+          target_price_usd?: number | null
+          token_address?: string | null
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string;
