@@ -70,3 +70,19 @@ Next.js monorepo, Railway multi-service deploy, reputation engine, watchlist UI,
 | Real-data charts        | `charts/series.ts`, `PerformanceCharts`, chart-data server fn                 |
 | Alert definitions       | migration 0010, `/alerts`, on-read wallet-activity eval; price alerts blocked |
 | Health + Railway docs   | `/api/health`, `railway.toml`, `docs/DEPLOYMENT.md`                           |
+
+## Phase 4 additions
+
+| Feature                 | Artifacts                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------ |
+| Durable worker          | `scripts/worker.ts`, `src/lib/worker/jobs.server.ts`, `backoff.ts`, `bun run worker` |
+| Migration 0011          | `worker_jobs`, `admin_roles`, `audit_events`, `wallets.public_contribute`            |
+| Privacy settings        | `/settings/privacy` — visibility, public_contribute, export JSON, deletion request   |
+| Admin basics            | `/admin` — indexing sample, jobs retry/enqueue, data-quality, audit (server-gated)   |
+| Discovery privacy       | Explore/leaderboard skip `public_contribute=false` wallets                           |
+| Railway web+worker docs | `railway.toml`, `docs/DEPLOYMENT.md` worker section                                  |
+| Tests                   | `src/test/backoff.test.ts`                                                           |
+
+## Explicitly not claimed in Phase 4
+
+Railway LIVE VERIFIED deploy, email notifications, protocol registry, Redis, WalletConnect cloud id, production OAuth verification, merging to `main`.

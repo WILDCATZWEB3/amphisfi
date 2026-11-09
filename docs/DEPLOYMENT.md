@@ -37,7 +37,7 @@ bun test src/test
 
 ## Migrations
 
-Apply in order on the live DB (additive only):
+Apply in order on the live DB (additive only; include through `0011_worker_admin_privacy.sql`):
 
 1. `0000` … `0007` (existing)
 2. `0008_discovery_social.sql`
@@ -74,3 +74,43 @@ Until those steps are done and verified, deployment status remains **not LIVE VE
 | Worker (planned) | Incremental indexing, price backfill, leaderboard/reputation jobs, price alerts | Not implemented as a separate process    |
 
 Do not use browser timers as an alert or indexing engine.
+
+## Worker service (Phase 4)
+
+Run continuous wallet sync + price-alert evaluation as a **separate** Railway service from the same repo.
+
+### Run command
+
+```bash
+bun run worker
+# equivalent: bun run scripts/worker.ts
+```
+
+Environment (same as web, plus optional):
+
+| Variable                    | Required             | Purpose                                          |
+| --------------------------- | -------------------- | ------------------------------------------------ |
+| `SUPABASE_URL`              | yes                  | DB                                               |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes                  | Job claim / sync writes                          |
+| `ROBINHOOD_RPC_URL`         | strongly recommended | Wallet sync RPC                                  |
+| `WORKER_ID`                 | optional             | Worker instance id (auto-generated)              |
+| `WORKER_LOOP_MS`            | optional             | Idle sleep between ticks (default 5000)          |
+| `WORKER_BUDGET_MS`          | optional             | Max processing time per tick (default 25000)     |
+| `AMPHIS_ADMIN_USER_IDS`     | optional             | Comma-separated Supabase user UUIDs for `/admin` |
+
+### Behaviour
+
+- DB-backed `worker_jobs` with queued/running/completed/failed, retries + exponential backoff
+- Unique running sync per wallet (no concurrent processing of the same wallet)
+- Graceful shutdown on SIGINT/SIGTERM
+- `wallet_sync` jobs call existing `syncRobinhoodWallet` + trade detect / value / PnL within a processing budget
+- `price_alerts` jobs call DefiLlama `currentPrices` for Robinhood tokens; **if price is null, the alert is not triggered** (skipped, never invented)
+
+### Railway web + worker split
+
+1. Create service **web** — build as in this file; start `bun run preview --host 0.0.0.0 --port $PORT`; health `/api/health`
+2. Create service **worker** — same build; start `bun run worker`; no public HTTP
+3. Apply migrations `0008`–`0011` on the database before relying on jobs/admin/privacy columns
+4. Set `AMPHIS_ADMIN_USER_IDS` (or insert into `admin_roles`) before using `/admin`
+
+**Status:** code + docs only — not claimed LIVE VERIFIED on Railway.
