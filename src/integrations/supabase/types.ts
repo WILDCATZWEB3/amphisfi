@@ -1,1848 +1,1321 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5";
-  };
+    PostgrestVersion: "14.17"
+  }
   public: {
     Tables: {
       evm_logs: {
         Row: {
-          address: string;
-          block_number: number;
-          chain: string;
-          created_at: string;
-          data: string;
-          id: string;
-          log_index: number;
-          topic0: string | null;
-          topics: string[];
-          transaction_hash: string;
-          transaction_id: string;
-        };
-        Insert: {
-          address: string;
-          block_number: number;
-          chain: string;
-          created_at?: string;
-          data?: string;
-          id?: string;
-          log_index: number;
-          topic0?: string | null;
-          topics?: string[];
-          transaction_hash: string;
-          transaction_id: string;
-        };
-        Update: {
-          address?: string;
-          block_number?: number;
-          chain?: string;
-          created_at?: string;
-          data?: string;
-          id?: string;
-          log_index?: number;
-          topic0?: string | null;
-          topics?: string[];
-          transaction_hash?: string;
-          transaction_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "evm_logs_transaction_id_fkey";
-            columns: ["transaction_id"];
-            isOneToOne: false;
-            referencedRelation: "evm_transactions";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      evm_performance_snapshots: {
-        Row: {
-          average_trade_usd: number | null;
-          best_trade_pnl_usd: number | null;
-          calculated_at: string;
-          capital_deployed_usd: number | null;
-          closed_trade_count: number;
-          data_completeness: string;
-          id: string;
-          losing_trades: number;
-          open_cost_basis_usd: number | null;
-          open_market_value_usd: number | null;
-          performance_ready: boolean;
-          period: string;
-          priced_trade_count: number;
-          realized_pnl_usd: number | null;
-          roi: number | null;
-          total_pnl_usd: number | null;
-          trade_count: number;
-          unclassified_tx_count: number | null;
-          unrealized_pnl_usd: number | null;
-          volume_usd: number | null;
-          wallet_id: string;
-          win_rate: number | null;
-          winning_trades: number;
-          worst_trade_pnl_usd: number | null;
-        };
-        Insert: {
-          average_trade_usd?: number | null;
-          best_trade_pnl_usd?: number | null;
-          calculated_at?: string;
-          capital_deployed_usd?: number | null;
-          closed_trade_count?: number;
-          data_completeness?: string;
-          id?: string;
-          losing_trades?: number;
-          open_cost_basis_usd?: number | null;
-          open_market_value_usd?: number | null;
-          performance_ready?: boolean;
-          period: string;
-          priced_trade_count?: number;
-          realized_pnl_usd?: number | null;
-          roi?: number | null;
-          total_pnl_usd?: number | null;
-          trade_count?: number;
-          unclassified_tx_count?: number | null;
-          unrealized_pnl_usd?: number | null;
-          volume_usd?: number | null;
-          wallet_id: string;
-          win_rate?: number | null;
-          winning_trades?: number;
-          worst_trade_pnl_usd?: number | null;
-        };
-        Update: {
-          average_trade_usd?: number | null;
-          best_trade_pnl_usd?: number | null;
-          calculated_at?: string;
-          capital_deployed_usd?: number | null;
-          closed_trade_count?: number;
-          data_completeness?: string;
-          id?: string;
-          losing_trades?: number;
-          open_cost_basis_usd?: number | null;
-          open_market_value_usd?: number | null;
-          performance_ready?: boolean;
-          period?: string;
-          priced_trade_count?: number;
-          realized_pnl_usd?: number | null;
-          roi?: number | null;
-          total_pnl_usd?: number | null;
-          trade_count?: number;
-          unclassified_tx_count?: number | null;
-          unrealized_pnl_usd?: number | null;
-          volume_usd?: number | null;
-          wallet_id?: string;
-          win_rate?: number | null;
-          winning_trades?: number;
-          worst_trade_pnl_usd?: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "evm_performance_snapshots_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      evm_position_lots: {
-        Row: {
-          acquired_at: string | null;
-          calculated_at: string;
-          cost_basis_usd: number;
-          id: string;
-          quantity: number;
-          remaining_cost_basis_usd: number;
-          remaining_quantity: number;
-          source_trade_id: string;
-          token: string;
-          wallet_id: string;
-        };
-        Insert: {
-          acquired_at?: string | null;
-          calculated_at?: string;
-          cost_basis_usd: number;
-          id?: string;
-          quantity: number;
-          remaining_cost_basis_usd: number;
-          remaining_quantity: number;
-          source_trade_id: string;
-          token: string;
-          wallet_id: string;
-        };
-        Update: {
-          acquired_at?: string | null;
-          calculated_at?: string;
-          cost_basis_usd?: number;
-          id?: string;
-          quantity?: number;
-          remaining_cost_basis_usd?: number;
-          remaining_quantity?: number;
-          source_trade_id?: string;
-          token?: string;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "evm_position_lots_source_trade_id_fkey";
-            columns: ["source_trade_id"];
-            isOneToOne: false;
-            referencedRelation: "evm_trades";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "evm_position_lots_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      evm_price_snapshots: {
-        Row: {
-          chain: string;
-          created_at: string;
-          id: string;
-          observed_ts: number | null;
-          price_usd: number | null;
-          requested_ts: number;
-          source: string;
-          status: string;
-          token: string;
-        };
-        Insert: {
-          chain: string;
-          created_at?: string;
-          id?: string;
-          observed_ts?: number | null;
-          price_usd?: number | null;
-          requested_ts: number;
-          source: string;
-          status: string;
-          token: string;
-        };
-        Update: {
-          chain?: string;
-          created_at?: string;
-          id?: string;
-          observed_ts?: number | null;
-          price_usd?: number | null;
-          requested_ts?: number;
-          source?: string;
-          status?: string;
-          token?: string;
-        };
-        Relationships: [];
-      };
-      evm_realized_pnl: {
-        Row: {
-          calculated_at: string;
-          cost_basis_usd: number;
-          disposed_at: string | null;
-          fully_matched: boolean;
-          id: string;
-          matched_quantity: number;
-          pnl_usd: number;
-          proceeds_usd: number;
-          quantity: number;
-          token: string;
-          trade_id: string;
-          wallet_id: string;
-        };
-        Insert: {
-          calculated_at?: string;
-          cost_basis_usd: number;
-          disposed_at?: string | null;
-          fully_matched: boolean;
-          id?: string;
-          matched_quantity: number;
-          pnl_usd: number;
-          proceeds_usd: number;
-          quantity: number;
-          token: string;
-          trade_id: string;
-          wallet_id: string;
-        };
-        Update: {
-          calculated_at?: string;
-          cost_basis_usd?: number;
-          disposed_at?: string | null;
-          fully_matched?: boolean;
-          id?: string;
-          matched_quantity?: number;
-          pnl_usd?: number;
-          proceeds_usd?: number;
-          quantity?: number;
-          token?: string;
-          trade_id?: string;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "evm_realized_pnl_trade_id_fkey";
-            columns: ["trade_id"];
-            isOneToOne: false;
-            referencedRelation: "evm_trades";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "evm_realized_pnl_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      evm_tokens: {
-        Row: {
-          address: string;
-          chain: string;
-          created_at: string;
-          decimals: number | null;
-          name: string | null;
-          symbol: string | null;
-          updated_at: string;
-        };
-        Insert: {
-          address: string;
-          chain: string;
-          created_at?: string;
-          decimals?: number | null;
-          name?: string | null;
-          symbol?: string | null;
-          updated_at?: string;
-        };
-        Update: {
-          address?: string;
-          chain?: string;
-          created_at?: string;
-          decimals?: number | null;
-          name?: string | null;
-          symbol?: string | null;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      evm_trades: {
-        Row: {
-          block_number: number | null;
-          block_time: string | null;
-          bought_amount_raw: number;
-          bought_decimals: number | null;
-          bought_price_usd: number | null;
-          bought_token: string;
-          chain: string;
-          confidence: string | null;
-          created_at: string;
-          detection_source: string | null;
-          direction: string | null;
-          gas_fee_wei: number | null;
-          id: string;
-          parser_version: number;
-          price_source: string | null;
-          protocol: string | null;
-          router_address: string | null;
-          sold_amount_raw: number;
-          sold_decimals: number | null;
-          sold_price_usd: number | null;
-          sold_token: string;
-          trade_value_usd: number | null;
-          transaction_hash: string;
-          transaction_id: string;
-          valuation_status: string;
-          valued_at: string | null;
-          wallet_id: string;
-        };
-        Insert: {
-          block_number?: number | null;
-          block_time?: string | null;
-          bought_amount_raw: number;
-          bought_decimals?: number | null;
-          bought_price_usd?: number | null;
-          bought_token: string;
-          chain?: string;
-          confidence?: string | null;
-          created_at?: string;
-          detection_source?: string | null;
-          direction?: string | null;
-          gas_fee_wei?: number | null;
-          id?: string;
-          parser_version: number;
-          price_source?: string | null;
-          protocol?: string | null;
-          router_address?: string | null;
-          sold_amount_raw: number;
-          sold_decimals?: number | null;
-          sold_price_usd?: number | null;
-          sold_token: string;
-          trade_value_usd?: number | null;
-          transaction_hash: string;
-          transaction_id: string;
-          valuation_status?: string;
-          valued_at?: string | null;
-          wallet_id: string;
-        };
-        Update: {
-          block_number?: number | null;
-          block_time?: string | null;
-          bought_amount_raw?: number;
-          bought_decimals?: number | null;
-          bought_price_usd?: number | null;
-          bought_token?: string;
-          chain?: string;
-          confidence?: string | null;
-          created_at?: string;
-          detection_source?: string | null;
-          direction?: string | null;
-          gas_fee_wei?: number | null;
-          id?: string;
-          parser_version?: number;
-          price_source?: string | null;
-          protocol?: string | null;
-          router_address?: string | null;
-          sold_amount_raw?: number;
-          sold_decimals?: number | null;
-          sold_price_usd?: number | null;
-          sold_token?: string;
-          trade_value_usd?: number | null;
-          transaction_hash?: string;
-          transaction_id?: string;
-          valuation_status?: string;
-          valued_at?: string | null;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "evm_trades_transaction_id_fkey";
-            columns: ["transaction_id"];
-            isOneToOne: false;
-            referencedRelation: "evm_transactions";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "evm_trades_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      evm_transactions: {
-        Row: {
-          block_hash: string | null;
-          block_number: number;
-          block_time: string | null;
-          chain: string;
-          contract_address: string | null;
-          created_at: string;
-          effective_gas_price_wei: number | null;
-          from_address: string;
-          gas_limit: number | null;
-          gas_price_wei: number | null;
-          gas_used: number | null;
-          hash: string;
-          id: string;
-          input: string | null;
-          log_count: number;
-          method_selector: string | null;
-          nonce: number | null;
-          status: string;
-          to_address: string | null;
-          tx_index: number | null;
-          tx_type: string | null;
-          value_wei: number;
-        };
-        Insert: {
-          block_hash?: string | null;
-          block_number: number;
-          block_time?: string | null;
-          chain: string;
-          contract_address?: string | null;
-          created_at?: string;
-          effective_gas_price_wei?: number | null;
-          from_address: string;
-          gas_limit?: number | null;
-          gas_price_wei?: number | null;
-          gas_used?: number | null;
-          hash: string;
-          id?: string;
-          input?: string | null;
-          log_count?: number;
-          method_selector?: string | null;
-          nonce?: number | null;
-          status: string;
-          to_address?: string | null;
-          tx_index?: number | null;
-          tx_type?: string | null;
-          value_wei?: number;
-        };
-        Update: {
-          block_hash?: string | null;
-          block_number?: number;
-          block_time?: string | null;
-          chain?: string;
-          contract_address?: string | null;
-          created_at?: string;
-          effective_gas_price_wei?: number | null;
-          from_address?: string;
-          gas_limit?: number | null;
-          gas_price_wei?: number | null;
-          gas_used?: number | null;
-          hash?: string;
-          id?: string;
-          input?: string | null;
-          log_count?: number;
-          method_selector?: string | null;
-          nonce?: number | null;
-          status?: string;
-          to_address?: string | null;
-          tx_index?: number | null;
-          tx_type?: string | null;
-          value_wei?: number;
-        };
-        Relationships: [];
-      };
-      performance_snapshots: {
-        Row: {
-          average_trade_pnl_usd: number | null;
-          calculated_at: string;
-          closed_trade_count: number;
-          data_completeness: string;
-          id: string;
-          largest_loss_usd: number | null;
-          largest_win_usd: number | null;
-          losing_trades: number;
-          method: string;
-          network_fees_usd: number | null;
-          notes: string[];
-          period: string;
-          priced_trade_count: number;
-          realized_pnl_usd: number | null;
-          total_pnl_usd: number | null;
-          trade_count: number;
-          unrealized_pnl_usd: number | null;
-          volume_usd: number | null;
-          wallet_id: string;
-          win_rate: number | null;
-          winning_trades: number;
-        };
-        Insert: {
-          average_trade_pnl_usd?: number | null;
-          calculated_at?: string;
-          closed_trade_count?: number;
-          data_completeness?: string;
-          id?: string;
-          largest_loss_usd?: number | null;
-          largest_win_usd?: number | null;
-          losing_trades?: number;
-          method?: string;
-          network_fees_usd?: number | null;
-          notes?: string[];
-          period: string;
-          priced_trade_count?: number;
-          realized_pnl_usd?: number | null;
-          total_pnl_usd?: number | null;
-          trade_count?: number;
-          unrealized_pnl_usd?: number | null;
-          volume_usd?: number | null;
-          wallet_id: string;
-          win_rate?: number | null;
-          winning_trades?: number;
-        };
-        Update: {
-          average_trade_pnl_usd?: number | null;
-          calculated_at?: string;
-          closed_trade_count?: number;
-          data_completeness?: string;
-          id?: string;
-          largest_loss_usd?: number | null;
-          largest_win_usd?: number | null;
-          losing_trades?: number;
-          method?: string;
-          network_fees_usd?: number | null;
-          notes?: string[];
-          period?: string;
-          priced_trade_count?: number;
-          realized_pnl_usd?: number | null;
-          total_pnl_usd?: number | null;
-          trade_count?: number;
-          unrealized_pnl_usd?: number | null;
-          volume_usd?: number | null;
-          wallet_id?: string;
-          win_rate?: number | null;
-          winning_trades?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "performance_snapshots_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      position_lots: {
-        Row: {
-          acquired_at: string | null;
-          calculated_at: string;
-          cost_basis_usd: number;
-          id: string;
-          mint: string;
-          quantity: number;
-          remaining_cost_basis_usd: number;
-          remaining_quantity: number;
-          source_trade_id: string;
-          wallet_id: string;
-        };
-        Insert: {
-          acquired_at?: string | null;
-          calculated_at?: string;
-          cost_basis_usd: number;
-          id?: string;
-          mint: string;
-          quantity: number;
-          remaining_cost_basis_usd: number;
-          remaining_quantity: number;
-          source_trade_id: string;
-          wallet_id: string;
-        };
-        Update: {
-          acquired_at?: string | null;
-          calculated_at?: string;
-          cost_basis_usd?: number;
-          id?: string;
-          mint?: string;
-          quantity?: number;
-          remaining_cost_basis_usd?: number;
-          remaining_quantity?: number;
-          source_trade_id?: string;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "position_lots_source_trade_id_fkey";
-            columns: ["source_trade_id"];
-            isOneToOne: false;
-            referencedRelation: "trades";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "position_lots_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      price_snapshots: {
-        Row: {
-          created_at: string;
-          id: string;
-          mint: string;
-          observed_at: string | null;
-          price_usd: number | null;
-          requested_at: string;
-          source: string;
-          status: string;
-        };
-        Insert: {
-          created_at?: string;
-          id?: string;
-          mint: string;
-          observed_at?: string | null;
-          price_usd?: number | null;
-          requested_at: string;
-          source: string;
-          status?: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          mint?: string;
-          observed_at?: string | null;
-          price_usd?: number | null;
-          requested_at?: string;
-          source?: string;
-          status?: string;
-        };
-        Relationships: [];
-      };
-      profiles: {
-        Row: {
-          avatar_url: string | null;
-          bio: string | null;
-          created_at: string;
-          id: string;
-          updated_at: string;
-          user_id: string | null;
-          username: string | null;
-          visibility: string;
-          wallet_address: string | null;
-        };
-        Insert: {
-          avatar_url?: string | null;
-          bio?: string | null;
-          created_at?: string;
-          id?: string;
-          updated_at?: string;
-          user_id?: string | null;
-          username?: string | null;
-          visibility?: string;
-          wallet_address?: string | null;
-        };
-        Update: {
-          avatar_url?: string | null;
-          bio?: string | null;
-          created_at?: string;
-          id?: string;
-          updated_at?: string;
-          user_id?: string | null;
-          username?: string | null;
-          visibility?: string;
-          wallet_address?: string | null;
-        };
-        Relationships: [];
-      };
-      realized_pnl: {
-        Row: {
-          calculated_at: string;
-          cost_basis_usd: number;
-          disposed_at: string | null;
-          fully_matched: boolean;
-          id: string;
-          matched_quantity: number;
-          mint: string;
-          pnl_usd: number;
-          price_source: string | null;
-          proceeds_usd: number;
-          quantity: number;
-          trade_id: string;
-          wallet_id: string;
-        };
-        Insert: {
-          calculated_at?: string;
-          cost_basis_usd: number;
-          disposed_at?: string | null;
-          fully_matched: boolean;
-          id?: string;
-          matched_quantity: number;
-          mint: string;
-          pnl_usd: number;
-          price_source?: string | null;
-          proceeds_usd: number;
-          quantity: number;
-          trade_id: string;
-          wallet_id: string;
-        };
-        Update: {
-          calculated_at?: string;
-          cost_basis_usd?: number;
-          disposed_at?: string | null;
-          fully_matched?: boolean;
-          id?: string;
-          matched_quantity?: number;
-          mint?: string;
-          pnl_usd?: number;
-          price_source?: string | null;
-          proceeds_usd?: number;
-          quantity?: number;
-          trade_id?: string;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "realized_pnl_trade_id_fkey";
-            columns: ["trade_id"];
-            isOneToOne: false;
-            referencedRelation: "trades";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "realized_pnl_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      token_assets: {
-        Row: {
-          created_at: string;
-          decimals: number | null;
-          logo_url: string | null;
-          mint: string;
-          name: string | null;
-          symbol: string | null;
-          updated_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          decimals?: number | null;
-          logo_url?: string | null;
-          mint: string;
-          name?: string | null;
-          symbol?: string | null;
-          updated_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          decimals?: number | null;
-          logo_url?: string | null;
-          mint?: string;
-          name?: string | null;
-          symbol?: string | null;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      token_transfers: {
-        Row: {
-          amount_raw: number;
-          block_number: number;
-          block_time: string | null;
-          chain: string;
-          created_at: string;
-          from_address: string;
-          id: string;
-          log_index: number;
-          standard: string;
-          to_address: string;
-          token_address: string;
-          transaction_hash: string;
-          transaction_id: string;
-        };
-        Insert: {
-          amount_raw: number;
-          block_number: number;
-          block_time?: string | null;
-          chain: string;
-          created_at?: string;
-          from_address: string;
-          id?: string;
-          log_index: number;
-          standard?: string;
-          to_address: string;
-          token_address: string;
-          transaction_hash: string;
-          transaction_id: string;
-        };
-        Update: {
-          amount_raw?: number;
-          block_number?: number;
-          block_time?: string | null;
-          chain?: string;
-          created_at?: string;
-          from_address?: string;
-          id?: string;
-          log_index?: number;
-          standard?: string;
-          to_address?: string;
-          token_address?: string;
-          transaction_hash?: string;
-          transaction_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "token_transfers_transaction_id_fkey";
-            columns: ["transaction_id"];
-            isOneToOne: false;
-            referencedRelation: "evm_transactions";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      trades: {
-        Row: {
-          block_time: string | null;
-          confidence: string;
-          created_at: string;
-          direction: string;
-          fee_lamports: number | null;
-          fee_usd: number | null;
-          id: string;
-          input_amount: number;
-          input_decimals: number;
-          input_mint: string;
-          input_value_usd: number | null;
-          output_amount: number;
-          output_decimals: number;
-          output_mint: string;
-          output_value_usd: number | null;
-          parser_version: number;
-          price_source: string | null;
-          price_timestamp: string | null;
-          protocol: string | null;
-          signature: string;
-          source: string | null;
-          trade_value_usd: number | null;
-          transaction_id: string;
-          updated_at: string;
-          valuation_status: string;
-          valued_at: string | null;
-          wallet_id: string;
-        };
-        Insert: {
-          block_time?: string | null;
-          confidence: string;
-          created_at?: string;
-          direction?: string;
-          fee_lamports?: number | null;
-          fee_usd?: number | null;
-          id?: string;
-          input_amount: number;
-          input_decimals: number;
-          input_mint: string;
-          input_value_usd?: number | null;
-          output_amount: number;
-          output_decimals: number;
-          output_mint: string;
-          output_value_usd?: number | null;
-          parser_version?: number;
-          price_source?: string | null;
-          price_timestamp?: string | null;
-          protocol?: string | null;
-          signature: string;
-          source?: string | null;
-          trade_value_usd?: number | null;
-          transaction_id: string;
-          updated_at?: string;
-          valuation_status?: string;
-          valued_at?: string | null;
-          wallet_id: string;
-        };
-        Update: {
-          block_time?: string | null;
-          confidence?: string;
-          created_at?: string;
-          direction?: string;
-          fee_lamports?: number | null;
-          fee_usd?: number | null;
-          id?: string;
-          input_amount?: number;
-          input_decimals?: number;
-          input_mint?: string;
-          input_value_usd?: number | null;
-          output_amount?: number;
-          output_decimals?: number;
-          output_mint?: string;
-          output_value_usd?: number | null;
-          parser_version?: number;
-          price_source?: string | null;
-          price_timestamp?: string | null;
-          protocol?: string | null;
-          signature?: string;
-          source?: string | null;
-          trade_value_usd?: number | null;
-          transaction_id?: string;
-          updated_at?: string;
-          valuation_status?: string;
-          valued_at?: string | null;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "trades_input_mint_fkey";
-            columns: ["input_mint"];
-            isOneToOne: false;
-            referencedRelation: "token_assets";
-            referencedColumns: ["mint"];
-          },
-          {
-            foreignKeyName: "trades_output_mint_fkey";
-            columns: ["output_mint"];
-            isOneToOne: false;
-            referencedRelation: "token_assets";
-            referencedColumns: ["mint"];
-          },
-          {
-            foreignKeyName: "trades_transaction_id_fkey";
-            columns: ["transaction_id"];
-            isOneToOne: true;
-            referencedRelation: "transactions";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "trades_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      transactions: {
-        Row: {
-          block_time: string | null;
-          created_at: string;
-          fee_lamports: number | null;
-          id: string;
-          parsed_type: string;
-          parser_version: number;
-          programs: string[];
-          raw_transaction_reference: string | null;
-          signature: string;
-          slot: number;
-          source: string | null;
-          status: string;
-          updated_at: string;
-          wallet_id: string;
-        };
-        Insert: {
-          block_time?: string | null;
-          created_at?: string;
-          fee_lamports?: number | null;
-          id?: string;
-          parsed_type?: string;
-          parser_version?: number;
-          programs?: string[];
-          raw_transaction_reference?: string | null;
-          signature: string;
-          slot: number;
-          source?: string | null;
-          status: string;
-          updated_at?: string;
-          wallet_id: string;
-        };
-        Update: {
-          block_time?: string | null;
-          created_at?: string;
-          fee_lamports?: number | null;
-          id?: string;
-          parsed_type?: string;
-          parser_version?: number;
-          programs?: string[];
-          raw_transaction_reference?: string | null;
-          signature?: string;
-          slot?: number;
-          source?: string | null;
-          status?: string;
-          updated_at?: string;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "transactions_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      wallet_transactions: {
-        Row: {
-          block_number: number;
-          classification: string | null;
-          created_at: string;
-          id: string;
-          role: string;
-          transaction_id: string;
-          wallet_id: string;
-        };
-        Insert: {
-          block_number: number;
-          classification?: string | null;
-          created_at?: string;
-          id?: string;
-          role: string;
-          transaction_id: string;
-          wallet_id: string;
-        };
-        Update: {
-          block_number?: number;
-          classification?: string | null;
-          created_at?: string;
-          id?: string;
-          role?: string;
-          transaction_id?: string;
-          wallet_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "wallet_transactions_transaction_id_fkey";
-            columns: ["transaction_id"];
-            isOneToOne: false;
-            referencedRelation: "evm_transactions";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "wallet_transactions_wallet_id_fkey";
-            columns: ["wallet_id"];
-            isOneToOne: false;
-            referencedRelation: "wallets";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-
-      protocols: {
-        Row: {
-          category: string
-          chain_id: number
-          created_at: string
-          docs_url: string | null
-          id: string
-          name: string
-          notes: string | null
-          slug: string
-          source: string
-          source_url: string
-          updated_at: string
-          verification_status: string
-          website_url: string | null
-        }
-        Insert: {
-          category: string
-          chain_id?: number
-          created_at?: string
-          docs_url?: string | null
-          id?: string
-          name: string
-          notes?: string | null
-          slug: string
-          source: string
-          source_url: string
-          updated_at?: string
-          verification_status?: string
-          website_url?: string | null
-        }
-        Update: {
-          category?: string
-          chain_id?: number
-          created_at?: string
-          docs_url?: string | null
-          id?: string
-          name?: string
-          notes?: string | null
-          slug?: string
-          source?: string
-          source_url?: string
-          updated_at?: string
-          verification_status?: string
-          website_url?: string | null
-        }
-        Relationships: []
-      }
-      protocol_contracts: {
-        Row: {
           address: string
-          address_normalized: string
-          chain_id: number
+          block_number: number
+          chain: string
           created_at: string
+          data: string
           id: string
-          protocol_id: string
-          role: string
-          source: string
-          source_url: string
+          log_index: number
+          topic0: string | null
+          topics: string[]
+          transaction_hash: string
+          transaction_id: string
         }
         Insert: {
           address: string
-          address_normalized: string
-          chain_id?: number
+          block_number: number
+          chain: string
           created_at?: string
+          data?: string
           id?: string
-          protocol_id: string
-          role: string
-          source: string
-          source_url: string
+          log_index: number
+          topic0?: string | null
+          topics?: string[]
+          transaction_hash: string
+          transaction_id: string
         }
         Update: {
           address?: string
-          address_normalized?: string
-          chain_id?: number
+          block_number?: number
+          chain?: string
           created_at?: string
+          data?: string
           id?: string
-          protocol_id?: string
-          role?: string
-          source?: string
-          source_url?: string
+          log_index?: number
+          topic0?: string | null
+          topics?: string[]
+          transaction_hash?: string
+          transaction_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "protocol_contracts_protocol_id_fkey"
-            columns: ["protocol_id"]
+            foreignKeyName: "evm_logs_transaction_id_fkey"
+            columns: ["transaction_id"]
             isOneToOne: false
-            referencedRelation: "protocols"
+            referencedRelation: "evm_transactions"
             referencedColumns: ["id"]
           },
         ]
       }
-      admin_roles: {
-        Row: { created_at: string; created_by: string | null; role: string; user_id: string }
-        Insert: { created_at?: string; created_by?: string | null; role?: string; user_id: string }
-        Update: { created_at?: string; created_by?: string | null; role?: string; user_id?: string }
-        Relationships: []
-      }
-      audit_events: {
-        Row: { action: string; actor_user_id: string | null; created_at: string; id: string; meta: Json; target_id: string | null; target_type: string | null }
-        Insert: { action: string; actor_user_id?: string | null; created_at?: string; id?: string; meta?: Json; target_id?: string | null; target_type?: string | null }
-        Update: { action?: string; actor_user_id?: string | null; created_at?: string; id?: string; meta?: Json; target_id?: string | null; target_type?: string | null }
-        Relationships: []
-      }
-      worker_jobs: {
+      evm_performance_snapshots: {
         Row: {
-          attempts: number
-          completed_at: string | null
-          created_at: string
-          id: string
-          kind: string
-          last_error: string | null
-          lease_expires_at: string | null
-          locked_at: string | null
-          locked_by: string | null
-          max_attempts: number
-          payload: Json
-          run_after: string
-          status: string
-          updated_at: string
-          wallet_id: string | null
-        }
-        Insert: {
-          attempts?: number
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          kind: string
-          last_error?: string | null
-          lease_expires_at?: string | null
-          locked_at?: string | null
-          locked_by?: string | null
-          max_attempts?: number
-          payload?: Json
-          run_after?: string
-          status?: string
-          updated_at?: string
-          wallet_id?: string | null
-        }
-        Update: {
-          attempts?: number
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          kind?: string
-          last_error?: string | null
-          lease_expires_at?: string | null
-          locked_at?: string | null
-          locked_by?: string | null
-          max_attempts?: number
-          payload?: Json
-          run_after?: string
-          status?: string
-          updated_at?: string
-          wallet_id?: string | null
-        }
-        Relationships: []
-      }
-      alert_definitions: {
-        Row: {
-          chain: string | null
-          created_at: string
-          direction: string | null
-          enabled: boolean
-          id: string
-          kind: string
-          label: string | null
-          last_evaluated_at: string | null
-          last_triggered_at: string | null
-          profile_id: string
-          target_price_usd: number | null
-          token_address: string | null
-          updated_at: string
-          wallet_id: string | null
-        }
-        Insert: {
-          chain?: string | null
-          created_at?: string
-          direction?: string | null
-          enabled?: boolean
-          id?: string
-          kind: string
-          label?: string | null
-          last_evaluated_at?: string | null
-          last_triggered_at?: string | null
-          profile_id: string
-          target_price_usd?: number | null
-          token_address?: string | null
-          updated_at?: string
-          wallet_id?: string | null
-        }
-        Update: {
-          chain?: string | null
-          created_at?: string
-          direction?: string | null
-          enabled?: boolean
-          id?: string
-          kind?: string
-          label?: string | null
-          last_evaluated_at?: string | null
-          last_triggered_at?: string | null
-          profile_id?: string
-          target_price_usd?: number | null
-          token_address?: string | null
-          updated_at?: string
-          wallet_id?: string | null
-        }
-        Relationships: []
-      }
-      follows: {
-        Row: {
-          created_at: string;
-          follower_profile_id: string;
-          following_profile_id: string;
-          id: string;
-        };
-        Insert: {
-          created_at?: string;
-          follower_profile_id: string;
-          following_profile_id: string;
-          id?: string;
-        };
-        Update: {
-          created_at?: string;
-          follower_profile_id?: string;
-          following_profile_id?: string;
-          id?: string;
-        };
-        Relationships: [];
-      };
-      leaderboard_entries: {
-        Row: {
-          id: string;
-          metric_available: boolean;
-          metric_value: number | null;
-          profile_id: string | null;
-          rank: number;
-          snapshot_id: string;
-          wallet_id: string;
-        };
-        Insert: {
-          id?: string;
-          metric_available?: boolean;
-          metric_value?: number | null;
-          profile_id?: string | null;
-          rank: number;
-          snapshot_id: string;
-          wallet_id: string;
-        };
-        Update: {
-          id?: string;
-          metric_available?: boolean;
-          metric_value?: number | null;
-          profile_id?: string | null;
-          rank?: number;
-          snapshot_id?: string;
-          wallet_id?: string;
-        };
-        Relationships: [];
-      };
-      leaderboard_snapshots: {
-        Row: {
-          calculated_at: string;
-          category: string;
-          entry_count: number;
-          id: string;
-          methodology: string;
-          period: string;
-        };
-        Insert: {
-          calculated_at?: string;
-          category: string;
-          entry_count?: number;
-          id?: string;
-          methodology: string;
-          period: string;
-        };
-        Update: {
-          calculated_at?: string;
-          category?: string;
-          entry_count?: number;
-          id?: string;
-          methodology?: string;
-          period?: string;
-        };
-        Relationships: [];
-      };
-      notification_preferences: {
-        Row: {
-          email: boolean
-          follows: boolean
-          profile_id: string
-          updated_at: string
-          wallet_sync: boolean
-        }
-        Insert: {
-          email?: boolean
-          follows?: boolean
-          profile_id: string
-          updated_at?: string
-          wallet_sync?: boolean
-        }
-        Update: {
-          email?: boolean
-          follows?: boolean
-          profile_id?: string
-          updated_at?: string
-          wallet_sync?: boolean
-        }
-        Relationships: []
-      }
-      reputation_snapshots: {
-        Row: {
-          breakdown: Json
+          average_trade_usd: number | null
+          best_trade_pnl_usd: number | null
           calculated_at: string
+          capital_deployed_usd: number | null
+          closed_trade_count: number
+          data_completeness: string
           id: string
-          methodology: string
-          score: number | null
-          score_version: string
-          status: string
+          losing_trades: number
+          open_cost_basis_usd: number | null
+          open_market_value_usd: number | null
+          performance_ready: boolean
+          period: string
+          priced_trade_count: number
+          realized_pnl_usd: number | null
+          roi: number | null
+          total_pnl_usd: number | null
+          trade_count: number
+          unclassified_tx_count: number | null
+          unrealized_pnl_usd: number | null
+          volume_usd: number | null
           wallet_id: string
+          win_rate: number | null
+          winning_trades: number
+          worst_trade_pnl_usd: number | null
         }
         Insert: {
-          breakdown?: Json
+          average_trade_usd?: number | null
+          best_trade_pnl_usd?: number | null
           calculated_at?: string
+          capital_deployed_usd?: number | null
+          closed_trade_count?: number
+          data_completeness?: string
           id?: string
-          methodology: string
-          score?: number | null
-          score_version: string
-          status: string
+          losing_trades?: number
+          open_cost_basis_usd?: number | null
+          open_market_value_usd?: number | null
+          performance_ready?: boolean
+          period: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          roi?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unclassified_tx_count?: number | null
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
           wallet_id: string
+          win_rate?: number | null
+          winning_trades?: number
+          worst_trade_pnl_usd?: number | null
         }
         Update: {
-          breakdown?: Json
+          average_trade_usd?: number | null
+          best_trade_pnl_usd?: number | null
           calculated_at?: string
+          capital_deployed_usd?: number | null
+          closed_trade_count?: number
+          data_completeness?: string
           id?: string
-          methodology?: string
-          score?: number | null
-          score_version?: string
-          status?: string
+          losing_trades?: number
+          open_cost_basis_usd?: number | null
+          open_market_value_usd?: number | null
+          performance_ready?: boolean
+          period?: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          roi?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unclassified_tx_count?: number | null
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
           wallet_id?: string
+          win_rate?: number | null
+          winning_trades?: number
+          worst_trade_pnl_usd?: number | null
         }
-        Relationships: []
-      }
-      notifications: {
-        Row: {
-          body: string | null;
-          created_at: string;
-          id: string;
-          payload: Json;
-          profile_id: string;
-          read_at: string | null;
-          title: string;
-          type: string;
-        };
-        Insert: {
-          body?: string | null;
-          created_at?: string;
-          id?: string;
-          payload?: Json;
-          profile_id: string;
-          read_at?: string | null;
-          title: string;
-          type: string;
-        };
-        Update: {
-          body?: string | null;
-          created_at?: string;
-          id?: string;
-          payload?: Json;
-          profile_id?: string;
-          read_at?: string | null;
-          title?: string;
-          type?: string;
-        };
-        Relationships: [];
-      };
-      trader_metrics: {
-        Row: {
-          average_trade_usd: number | null;
-          best_trade_pnl_usd: number | null;
-          calculated_at: string;
-          capital_deployed_usd: number | null;
-          closed_trade_count: number;
-          data_completeness: string;
-          eligibility_notes: string | null;
-          id: string;
-          leaderboard_eligible: boolean;
-          losing_trades: number;
-          performance_ready: boolean;
-          period: string;
-          priced_trade_count: number;
-          realized_pnl_usd: number | null;
-          roi: number | null;
-          total_pnl_usd: number | null;
-          trade_count: number;
-          unrealized_pnl_usd: number | null;
-          volume_usd: number | null;
-          wallet_id: string;
-          win_rate: number | null;
-          winning_trades: number;
-          worst_trade_pnl_usd: number | null;
-        };
-        Insert: {
-          average_trade_usd?: number | null;
-          best_trade_pnl_usd?: number | null;
-          calculated_at?: string;
-          capital_deployed_usd?: number | null;
-          closed_trade_count?: number;
-          data_completeness?: string;
-          eligibility_notes?: string | null;
-          id?: string;
-          leaderboard_eligible?: boolean;
-          losing_trades?: number;
-          performance_ready?: boolean;
-          period: string;
-          priced_trade_count?: number;
-          realized_pnl_usd?: number | null;
-          roi?: number | null;
-          total_pnl_usd?: number | null;
-          trade_count?: number;
-          unrealized_pnl_usd?: number | null;
-          volume_usd?: number | null;
-          wallet_id: string;
-          win_rate?: number | null;
-          winning_trades?: number;
-          worst_trade_pnl_usd?: number | null;
-        };
-        Update: {
-          average_trade_usd?: number | null;
-          best_trade_pnl_usd?: number | null;
-          calculated_at?: string;
-          capital_deployed_usd?: number | null;
-          closed_trade_count?: number;
-          data_completeness?: string;
-          eligibility_notes?: string | null;
-          id?: string;
-          leaderboard_eligible?: boolean;
-          losing_trades?: number;
-          performance_ready?: boolean;
-          period?: string;
-          priced_trade_count?: number;
-          realized_pnl_usd?: number | null;
-          roi?: number | null;
-          total_pnl_usd?: number | null;
-          trade_count?: number;
-          unrealized_pnl_usd?: number | null;
-          volume_usd?: number | null;
-          wallet_id?: string;
-          win_rate?: number | null;
-          winning_trades?: number;
-          worst_trade_pnl_usd?: number | null;
-        };
-        Relationships: [];
-      };
-      watchlist_items: {
-        Row: {
-          chain: string | null;
-          created_at: string;
-          id: string;
-          item_type: string;
-          profile_id: string | null;
-          token_address: string | null;
-          wallet_id: string | null;
-          watchlist_id: string;
-        };
-        Insert: {
-          chain?: string | null;
-          created_at?: string;
-          id?: string;
-          item_type: string;
-          profile_id?: string | null;
-          token_address?: string | null;
-          wallet_id?: string | null;
-          watchlist_id: string;
-        };
-        Update: {
-          chain?: string | null;
-          created_at?: string;
-          id?: string;
-          item_type?: string;
-          profile_id?: string | null;
-          token_address?: string | null;
-          wallet_id?: string | null;
-          watchlist_id?: string;
-        };
-        Relationships: [];
-      };
-      watchlists: {
-        Row: {
-          created_at: string;
-          id: string;
-          name: string;
-          profile_id: string;
-          updated_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          id?: string;
-          name?: string;
-          profile_id: string;
-          updated_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          name?: string;
-          profile_id?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      wallets: {
-        Row: {
-          address: string;
-          address_normalized: string | null;
-          backfill_complete: boolean;
-          blocks_processed: number;
-          chain: string;
-          created_at: string;
-          first_seen_at: string;
-          id: string;
-          is_primary: boolean;
-          last_indexed_block: number | null;
-          last_indexed_transaction: string | null;
-          last_signature: string | null;
-          last_synced_at: string | null;
-          newest_block_time: string | null;
-          newest_signature: string | null;
-          oldest_block_time: string | null;
-          oldest_indexed_block: number | null;
-          oldest_signature: string | null;
-          ownership_verified: boolean;
-          profile_id: string;
-          public_contribute: boolean;
-          sync_error: string | null;
-          sync_started_at: string | null;
-          sync_status: string;
-          txs_discovered: number;
-          txs_stored: number;
-          updated_at: string;
-        };
-        Insert: {
-          address: string;
-          address_normalized?: string | null;
-          backfill_complete?: boolean;
-          blocks_processed?: number;
-          chain?: string;
-          created_at?: string;
-          first_seen_at?: string;
-          id?: string;
-          is_primary?: boolean;
-          last_indexed_block?: number | null;
-          last_indexed_transaction?: string | null;
-          last_signature?: string | null;
-          last_synced_at?: string | null;
-          newest_block_time?: string | null;
-          newest_signature?: string | null;
-          oldest_block_time?: string | null;
-          oldest_indexed_block?: number | null;
-          oldest_signature?: string | null;
-          ownership_verified?: boolean;
-          profile_id: string;
-          public_contribute?: boolean;
-          sync_error?: string | null;
-          sync_started_at?: string | null;
-          sync_status?: string;
-          txs_discovered?: number;
-          txs_stored?: number;
-          updated_at?: string;
-        };
-        Update: {
-          address?: string;
-          address_normalized?: string | null;
-          backfill_complete?: boolean;
-          blocks_processed?: number;
-          chain?: string;
-          created_at?: string;
-          first_seen_at?: string;
-          id?: string;
-          is_primary?: boolean;
-          last_indexed_block?: number | null;
-          last_indexed_transaction?: string | null;
-          last_signature?: string | null;
-          last_synced_at?: string | null;
-          newest_block_time?: string | null;
-          newest_signature?: string | null;
-          oldest_block_time?: string | null;
-          oldest_indexed_block?: number | null;
-          oldest_signature?: string | null;
-          ownership_verified?: boolean;
-          profile_id?: string;
-          public_contribute?: boolean;
-          sync_error?: string | null;
-          sync_started_at?: string | null;
-          sync_status?: string;
-          txs_discovered?: number;
-          txs_stored?: number;
-          updated_at?: string;
-        };
         Relationships: [
           {
-            foreignKeyName: "wallets_profile_id_fkey";
-            columns: ["profile_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            foreignKeyName: "evm_performance_snapshots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      check_username: { Args: { _u: string }; Returns: string };
-      is_reserved_username: { Args: { _u: string }; Returns: boolean };
-      claim_worker_job: {
-        Args: { p_worker_id: string; p_lease_seconds?: number };
-        Returns: {
-          attempts: number
-          completed_at: string | null
+        ]
+      }
+      evm_position_lots: {
+        Row: {
+          acquired_at: string | null
+          calculated_at: string
+          cost_basis_usd: number
+          id: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          token: string
+          wallet_id: string
+        }
+        Insert: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd: number
+          id?: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          token: string
+          wallet_id: string
+        }
+        Update: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd?: number
+          id?: string
+          quantity?: number
+          remaining_cost_basis_usd?: number
+          remaining_quantity?: number
+          source_trade_id?: string
+          token?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_position_lots_source_trade_id_fkey"
+            columns: ["source_trade_id"]
+            isOneToOne: false
+            referencedRelation: "evm_trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evm_position_lots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evm_price_snapshots: {
+        Row: {
+          chain: string
           created_at: string
           id: string
-          kind: string
-          last_error: string | null
-          lease_expires_at: string | null
-          locked_at: string | null
-          locked_by: string | null
-          max_attempts: number
-          payload: Json
-          run_after: string
+          observed_ts: number | null
+          price_usd: number | null
+          requested_ts: number
+          source: string
+          status: string
+          token: string
+        }
+        Insert: {
+          chain: string
+          created_at?: string
+          id?: string
+          observed_ts?: number | null
+          price_usd?: number | null
+          requested_ts: number
+          source: string
+          status: string
+          token: string
+        }
+        Update: {
+          chain?: string
+          created_at?: string
+          id?: string
+          observed_ts?: number | null
+          price_usd?: number | null
+          requested_ts?: number
+          source?: string
+          status?: string
+          token?: string
+        }
+        Relationships: []
+      }
+      evm_realized_pnl: {
+        Row: {
+          calculated_at: string
+          cost_basis_usd: number
+          disposed_at: string | null
+          fully_matched: boolean
+          id: string
+          matched_quantity: number
+          pnl_usd: number
+          proceeds_usd: number
+          quantity: number
+          token: string
+          trade_id: string
+          wallet_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          cost_basis_usd: number
+          disposed_at?: string | null
+          fully_matched: boolean
+          id?: string
+          matched_quantity: number
+          pnl_usd: number
+          proceeds_usd: number
+          quantity: number
+          token: string
+          trade_id: string
+          wallet_id: string
+        }
+        Update: {
+          calculated_at?: string
+          cost_basis_usd?: number
+          disposed_at?: string | null
+          fully_matched?: boolean
+          id?: string
+          matched_quantity?: number
+          pnl_usd?: number
+          proceeds_usd?: number
+          quantity?: number
+          token?: string
+          trade_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_realized_pnl_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "evm_trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evm_realized_pnl_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evm_tokens: {
+        Row: {
+          address: string
+          chain: string
+          created_at: string
+          decimals: number | null
+          name: string | null
+          symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          chain: string
+          created_at?: string
+          decimals?: number | null
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          chain?: string
+          created_at?: string
+          decimals?: number | null
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      evm_trades: {
+        Row: {
+          block_number: number | null
+          block_time: string | null
+          bought_amount_raw: number
+          bought_decimals: number | null
+          bought_price_usd: number | null
+          bought_token: string
+          chain: string
+          confidence: string | null
+          created_at: string
+          detection_source: string | null
+          direction: string | null
+          gas_fee_wei: number | null
+          id: string
+          parser_version: number
+          price_source: string | null
+          protocol: string | null
+          router_address: string | null
+          sold_amount_raw: number
+          sold_decimals: number | null
+          sold_price_usd: number | null
+          sold_token: string
+          trade_value_usd: number | null
+          transaction_hash: string
+          transaction_id: string
+          valuation_status: string
+          valued_at: string | null
+          wallet_id: string
+        }
+        Insert: {
+          block_number?: number | null
+          block_time?: string | null
+          bought_amount_raw: number
+          bought_decimals?: number | null
+          bought_price_usd?: number | null
+          bought_token: string
+          chain?: string
+          confidence?: string | null
+          created_at?: string
+          detection_source?: string | null
+          direction?: string | null
+          gas_fee_wei?: number | null
+          id?: string
+          parser_version: number
+          price_source?: string | null
+          protocol?: string | null
+          router_address?: string | null
+          sold_amount_raw: number
+          sold_decimals?: number | null
+          sold_price_usd?: number | null
+          sold_token: string
+          trade_value_usd?: number | null
+          transaction_hash: string
+          transaction_id: string
+          valuation_status?: string
+          valued_at?: string | null
+          wallet_id: string
+        }
+        Update: {
+          block_number?: number | null
+          block_time?: string | null
+          bought_amount_raw?: number
+          bought_decimals?: number | null
+          bought_price_usd?: number | null
+          bought_token?: string
+          chain?: string
+          confidence?: string | null
+          created_at?: string
+          detection_source?: string | null
+          direction?: string | null
+          gas_fee_wei?: number | null
+          id?: string
+          parser_version?: number
+          price_source?: string | null
+          protocol?: string | null
+          router_address?: string | null
+          sold_amount_raw?: number
+          sold_decimals?: number | null
+          sold_price_usd?: number | null
+          sold_token?: string
+          trade_value_usd?: number | null
+          transaction_hash?: string
+          transaction_id?: string
+          valuation_status?: string
+          valued_at?: string | null
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evm_trades_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evm_trades_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evm_transactions: {
+        Row: {
+          block_hash: string | null
+          block_number: number
+          block_time: string | null
+          chain: string
+          contract_address: string | null
+          created_at: string
+          effective_gas_price_wei: number | null
+          from_address: string
+          gas_limit: number | null
+          gas_price_wei: number | null
+          gas_used: number | null
+          hash: string
+          id: string
+          input: string | null
+          log_count: number
+          method_selector: string | null
+          nonce: number | null
+          status: string
+          to_address: string | null
+          tx_index: number | null
+          tx_type: string | null
+          value_wei: number
+        }
+        Insert: {
+          block_hash?: string | null
+          block_number: number
+          block_time?: string | null
+          chain: string
+          contract_address?: string | null
+          created_at?: string
+          effective_gas_price_wei?: number | null
+          from_address: string
+          gas_limit?: number | null
+          gas_price_wei?: number | null
+          gas_used?: number | null
+          hash: string
+          id?: string
+          input?: string | null
+          log_count?: number
+          method_selector?: string | null
+          nonce?: number | null
+          status: string
+          to_address?: string | null
+          tx_index?: number | null
+          tx_type?: string | null
+          value_wei?: number
+        }
+        Update: {
+          block_hash?: string | null
+          block_number?: number
+          block_time?: string | null
+          chain?: string
+          contract_address?: string | null
+          created_at?: string
+          effective_gas_price_wei?: number | null
+          from_address?: string
+          gas_limit?: number | null
+          gas_price_wei?: number | null
+          gas_used?: number | null
+          hash?: string
+          id?: string
+          input?: string | null
+          log_count?: number
+          method_selector?: string | null
+          nonce?: number | null
+          status?: string
+          to_address?: string | null
+          tx_index?: number | null
+          tx_type?: string | null
+          value_wei?: number
+        }
+        Relationships: []
+      }
+      performance_snapshots: {
+        Row: {
+          average_trade_pnl_usd: number | null
+          calculated_at: string
+          closed_trade_count: number
+          data_completeness: string
+          id: string
+          largest_loss_usd: number | null
+          largest_win_usd: number | null
+          losing_trades: number
+          method: string
+          network_fees_usd: number | null
+          notes: string[]
+          period: string
+          priced_trade_count: number
+          realized_pnl_usd: number | null
+          total_pnl_usd: number | null
+          trade_count: number
+          unrealized_pnl_usd: number | null
+          volume_usd: number | null
+          wallet_id: string
+          win_rate: number | null
+          winning_trades: number
+        }
+        Insert: {
+          average_trade_pnl_usd?: number | null
+          calculated_at?: string
+          closed_trade_count?: number
+          data_completeness?: string
+          id?: string
+          largest_loss_usd?: number | null
+          largest_win_usd?: number | null
+          losing_trades?: number
+          method?: string
+          network_fees_usd?: number | null
+          notes?: string[]
+          period: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
+          wallet_id: string
+          win_rate?: number | null
+          winning_trades?: number
+        }
+        Update: {
+          average_trade_pnl_usd?: number | null
+          calculated_at?: string
+          closed_trade_count?: number
+          data_completeness?: string
+          id?: string
+          largest_loss_usd?: number | null
+          largest_win_usd?: number | null
+          losing_trades?: number
+          method?: string
+          network_fees_usd?: number | null
+          notes?: string[]
+          period?: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
+          wallet_id?: string
+          win_rate?: number | null
+          winning_trades?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_snapshots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      position_lots: {
+        Row: {
+          acquired_at: string | null
+          calculated_at: string
+          cost_basis_usd: number
+          id: string
+          mint: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          wallet_id: string
+        }
+        Insert: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd: number
+          id?: string
+          mint: string
+          quantity: number
+          remaining_cost_basis_usd: number
+          remaining_quantity: number
+          source_trade_id: string
+          wallet_id: string
+        }
+        Update: {
+          acquired_at?: string | null
+          calculated_at?: string
+          cost_basis_usd?: number
+          id?: string
+          mint?: string
+          quantity?: number
+          remaining_cost_basis_usd?: number
+          remaining_quantity?: number
+          source_trade_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "position_lots_source_trade_id_fkey"
+            columns: ["source_trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "position_lots_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          mint: string
+          observed_at: string | null
+          price_usd: number | null
+          requested_at: string
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mint: string
+          observed_at?: string | null
+          price_usd?: number | null
+          requested_at: string
+          source: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mint?: string
+          observed_at?: string | null
+          price_usd?: number | null
+          requested_at?: string
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string | null
+          username: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+          username?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      realized_pnl: {
+        Row: {
+          calculated_at: string
+          cost_basis_usd: number
+          disposed_at: string | null
+          fully_matched: boolean
+          id: string
+          matched_quantity: number
+          mint: string
+          pnl_usd: number
+          price_source: string | null
+          proceeds_usd: number
+          quantity: number
+          trade_id: string
+          wallet_id: string
+        }
+        Insert: {
+          calculated_at?: string
+          cost_basis_usd: number
+          disposed_at?: string | null
+          fully_matched: boolean
+          id?: string
+          matched_quantity: number
+          mint: string
+          pnl_usd: number
+          price_source?: string | null
+          proceeds_usd: number
+          quantity: number
+          trade_id: string
+          wallet_id: string
+        }
+        Update: {
+          calculated_at?: string
+          cost_basis_usd?: number
+          disposed_at?: string | null
+          fully_matched?: boolean
+          id?: string
+          matched_quantity?: number
+          mint?: string
+          pnl_usd?: number
+          price_source?: string | null
+          proceeds_usd?: number
+          quantity?: number
+          trade_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "realized_pnl_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "trades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "realized_pnl_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      token_assets: {
+        Row: {
+          created_at: string
+          decimals: number | null
+          logo_url: string | null
+          mint: string
+          name: string | null
+          symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decimals?: number | null
+          logo_url?: string | null
+          mint: string
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decimals?: number | null
+          logo_url?: string | null
+          mint?: string
+          name?: string | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      token_transfers: {
+        Row: {
+          amount_raw: number
+          block_number: number
+          block_time: string | null
+          chain: string
+          created_at: string
+          from_address: string
+          id: string
+          log_index: number
+          standard: string
+          to_address: string
+          token_address: string
+          transaction_hash: string
+          transaction_id: string
+        }
+        Insert: {
+          amount_raw: number
+          block_number: number
+          block_time?: string | null
+          chain: string
+          created_at?: string
+          from_address: string
+          id?: string
+          log_index: number
+          standard?: string
+          to_address: string
+          token_address: string
+          transaction_hash: string
+          transaction_id: string
+        }
+        Update: {
+          amount_raw?: number
+          block_number?: number
+          block_time?: string | null
+          chain?: string
+          created_at?: string
+          from_address?: string
+          id?: string
+          log_index?: number
+          standard?: string
+          to_address?: string
+          token_address?: string
+          transaction_hash?: string
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_transfers_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trades: {
+        Row: {
+          block_time: string | null
+          confidence: string
+          created_at: string
+          direction: string
+          fee_lamports: number | null
+          fee_usd: number | null
+          id: string
+          input_amount: number
+          input_decimals: number
+          input_mint: string
+          input_value_usd: number | null
+          output_amount: number
+          output_decimals: number
+          output_mint: string
+          output_value_usd: number | null
+          parser_version: number
+          price_source: string | null
+          price_timestamp: string | null
+          protocol: string | null
+          signature: string
+          source: string | null
+          trade_value_usd: number | null
+          transaction_id: string
+          updated_at: string
+          valuation_status: string
+          valued_at: string | null
+          wallet_id: string
+        }
+        Insert: {
+          block_time?: string | null
+          confidence: string
+          created_at?: string
+          direction?: string
+          fee_lamports?: number | null
+          fee_usd?: number | null
+          id?: string
+          input_amount: number
+          input_decimals: number
+          input_mint: string
+          input_value_usd?: number | null
+          output_amount: number
+          output_decimals: number
+          output_mint: string
+          output_value_usd?: number | null
+          parser_version?: number
+          price_source?: string | null
+          price_timestamp?: string | null
+          protocol?: string | null
+          signature: string
+          source?: string | null
+          trade_value_usd?: number | null
+          transaction_id: string
+          updated_at?: string
+          valuation_status?: string
+          valued_at?: string | null
+          wallet_id: string
+        }
+        Update: {
+          block_time?: string | null
+          confidence?: string
+          created_at?: string
+          direction?: string
+          fee_lamports?: number | null
+          fee_usd?: number | null
+          id?: string
+          input_amount?: number
+          input_decimals?: number
+          input_mint?: string
+          input_value_usd?: number | null
+          output_amount?: number
+          output_decimals?: number
+          output_mint?: string
+          output_value_usd?: number | null
+          parser_version?: number
+          price_source?: string | null
+          price_timestamp?: string | null
+          protocol?: string | null
+          signature?: string
+          source?: string | null
+          trade_value_usd?: number | null
+          transaction_id?: string
+          updated_at?: string
+          valuation_status?: string
+          valued_at?: string | null
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_input_mint_fkey"
+            columns: ["input_mint"]
+            isOneToOne: false
+            referencedRelation: "token_assets"
+            referencedColumns: ["mint"]
+          },
+          {
+            foreignKeyName: "trades_output_mint_fkey"
+            columns: ["output_mint"]
+            isOneToOne: false
+            referencedRelation: "token_assets"
+            referencedColumns: ["mint"]
+          },
+          {
+            foreignKeyName: "trades_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: true
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trades_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          block_time: string | null
+          created_at: string
+          fee_lamports: number | null
+          id: string
+          parsed_type: string
+          parser_version: number
+          programs: string[]
+          raw_transaction_reference: string | null
+          signature: string
+          slot: number
+          source: string | null
           status: string
           updated_at: string
-          wallet_id: string | null
+          wallet_id: string
         }
-      };
-    };
+        Insert: {
+          block_time?: string | null
+          created_at?: string
+          fee_lamports?: number | null
+          id?: string
+          parsed_type?: string
+          parser_version?: number
+          programs?: string[]
+          raw_transaction_reference?: string | null
+          signature: string
+          slot: number
+          source?: string | null
+          status: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          block_time?: string | null
+          created_at?: string
+          fee_lamports?: number | null
+          id?: string
+          parsed_type?: string
+          parser_version?: number
+          programs?: string[]
+          raw_transaction_reference?: string | null
+          signature?: string
+          slot?: number
+          source?: string | null
+          status?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_transactions: {
+        Row: {
+          block_number: number
+          classification: string | null
+          created_at: string
+          id: string
+          role: string
+          transaction_id: string
+          wallet_id: string
+        }
+        Insert: {
+          block_number: number
+          classification?: string | null
+          created_at?: string
+          id?: string
+          role: string
+          transaction_id: string
+          wallet_id: string
+        }
+        Update: {
+          block_number?: number
+          classification?: string | null
+          created_at?: string
+          id?: string
+          role?: string
+          transaction_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          address: string
+          address_normalized: string | null
+          backfill_complete: boolean
+          blocks_processed: number
+          chain: string
+          created_at: string
+          first_seen_at: string
+          id: string
+          is_primary: boolean
+          last_indexed_block: number | null
+          last_indexed_transaction: string | null
+          last_signature: string | null
+          last_synced_at: string | null
+          newest_block_time: string | null
+          newest_signature: string | null
+          oldest_block_time: string | null
+          oldest_indexed_block: number | null
+          oldest_signature: string | null
+          ownership_verified: boolean
+          profile_id: string
+          sync_error: string | null
+          sync_started_at: string | null
+          sync_status: string
+          txs_discovered: number
+          txs_stored: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          address_normalized?: string | null
+          backfill_complete?: boolean
+          blocks_processed?: number
+          chain?: string
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          is_primary?: boolean
+          last_indexed_block?: number | null
+          last_indexed_transaction?: string | null
+          last_signature?: string | null
+          last_synced_at?: string | null
+          newest_block_time?: string | null
+          newest_signature?: string | null
+          oldest_block_time?: string | null
+          oldest_indexed_block?: number | null
+          oldest_signature?: string | null
+          ownership_verified?: boolean
+          profile_id: string
+          sync_error?: string | null
+          sync_started_at?: string | null
+          sync_status?: string
+          txs_discovered?: number
+          txs_stored?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          address_normalized?: string | null
+          backfill_complete?: boolean
+          blocks_processed?: number
+          chain?: string
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          is_primary?: boolean
+          last_indexed_block?: number | null
+          last_indexed_transaction?: string | null
+          last_signature?: string | null
+          last_synced_at?: string | null
+          newest_block_time?: string | null
+          newest_signature?: string | null
+          oldest_block_time?: string | null
+          oldest_indexed_block?: number | null
+          oldest_signature?: string | null
+          ownership_verified?: boolean
+          profile_id?: string
+          sync_error?: string | null
+          sync_started_at?: string | null
+          sync_status?: string
+          txs_discovered?: number
+          txs_stored?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      check_username: { Args: { _u: string }; Returns: string }
+      is_reserved_username: { Args: { _u: string }; Returns: boolean }
+    }
     Enums: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R;
+      Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R;
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
       }
       ? R
       : never
-    : never;
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I;
+      Insert: infer I
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I;
+        Insert: infer I
       }
       ? I
       : never
-    : never;
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U;
+      Update: infer U
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U;
+        Update: infer U
       }
       ? U
       : never
-    : never;
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never;
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    keyof DefaultSchema["CompositeTypes"] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never;
+    : never
 
 export const Constants = {
   public: {
     Enums: {},
   },
-} as const;
+} as const
