@@ -1082,6 +1082,69 @@ export type Database = {
           },
         ];
       };
+      admin_roles: {
+        Row: { created_at: string; created_by: string | null; role: string; user_id: string }
+        Insert: { created_at?: string; created_by?: string | null; role?: string; user_id: string }
+        Update: { created_at?: string; created_by?: string | null; role?: string; user_id?: string }
+        Relationships: []
+      }
+      audit_events: {
+        Row: { action: string; actor_user_id: string | null; created_at: string; id: string; meta: Json; target_id: string | null; target_type: string | null }
+        Insert: { action: string; actor_user_id?: string | null; created_at?: string; id?: string; meta?: Json; target_id?: string | null; target_type?: string | null }
+        Update: { action?: string; actor_user_id?: string | null; created_at?: string; id?: string; meta?: Json; target_id?: string | null; target_type?: string | null }
+        Relationships: []
+      }
+      worker_jobs: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          payload: Json
+          run_after: string
+          status: string
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
+          payload?: Json
+          run_after?: string
+          status?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
+          payload?: Json
+          run_after?: string
+          status?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: []
+      }
       alert_definitions: {
         Row: {
           chain: string | null
@@ -1455,6 +1518,7 @@ export type Database = {
           oldest_signature: string | null;
           ownership_verified: boolean;
           profile_id: string;
+          public_contribute: boolean;
           sync_error: string | null;
           sync_started_at: string | null;
           sync_status: string;
@@ -1483,6 +1547,7 @@ export type Database = {
           oldest_signature?: string | null;
           ownership_verified?: boolean;
           profile_id: string;
+          public_contribute?: boolean;
           sync_error?: string | null;
           sync_started_at?: string | null;
           sync_status?: string;
@@ -1511,6 +1576,7 @@ export type Database = {
           oldest_signature?: string | null;
           ownership_verified?: boolean;
           profile_id?: string;
+          public_contribute?: boolean;
           sync_error?: string | null;
           sync_started_at?: string | null;
           sync_status?: string;
