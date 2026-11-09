@@ -1160,6 +1160,60 @@ export type Database = {
         };
         Relationships: [];
       };
+      notification_preferences: {
+        Row: {
+          follows: boolean
+          profile_id: string
+          updated_at: string
+          wallet_sync: boolean
+        }
+        Insert: {
+          follows?: boolean
+          profile_id: string
+          updated_at?: string
+          wallet_sync?: boolean
+        }
+        Update: {
+          follows?: boolean
+          profile_id?: string
+          updated_at?: string
+          wallet_sync?: boolean
+        }
+        Relationships: []
+      }
+      reputation_snapshots: {
+        Row: {
+          breakdown: Json
+          calculated_at: string
+          id: string
+          methodology: string
+          score: number | null
+          score_version: string
+          status: string
+          wallet_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          calculated_at?: string
+          id?: string
+          methodology: string
+          score?: number | null
+          score_version: string
+          status: string
+          wallet_id: string
+        }
+        Update: {
+          breakdown?: Json
+          calculated_at?: string
+          id?: string
+          methodology?: string
+          score?: number | null
+          score_version?: string
+          status?: string
+          wallet_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null;
