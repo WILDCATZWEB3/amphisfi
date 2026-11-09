@@ -57,6 +57,13 @@
       "when": 1791305576470,
       "tag": "0007_trade_engine_evidence",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794248421655,
+      "tag": "0008_discovery_social",
+      "breakpoints": true
     }
   ]
 }
