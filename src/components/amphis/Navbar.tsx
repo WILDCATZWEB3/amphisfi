@@ -38,6 +38,7 @@ const links = [
   { to: "/notifications", label: "Inbox" },
   { to: "/alerts", label: "Alerts" },
   { to: "/me", label: "My Profile" },
+  { to: "/settings/privacy", label: "Privacy" },
 ] as const;
 
 export function Navbar() {

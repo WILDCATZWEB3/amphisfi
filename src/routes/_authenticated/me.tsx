@@ -16,9 +16,15 @@ export const Route = createFileRoute("/_authenticated/me")({
   head: () => ({
     meta: [
       { title: "My Profile — Amphis" },
-      { name: "description", content: "Manage your Amphis identity, picture and verified Robinhood Chain wallet." },
+      {
+        name: "description",
+        content: "Manage your Amphis identity, picture and verified Robinhood Chain wallet.",
+      },
       { property: "og:title", content: "My Profile — Amphis" },
-      { property: "og:description", content: "Manage your Amphis identity, picture and verified Robinhood Chain wallet." },
+      {
+        property: "og:description",
+        content: "Manage your Amphis identity, picture and verified Robinhood Chain wallet.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -32,11 +38,20 @@ function MyProfilePage() {
   const q = useMyProfile(user.id);
   const p = q.data;
 
-  if (q.isLoading) return <div className="container-page py-16"><LoadingState label="Loading profile" /></div>;
+  if (q.isLoading)
+    return (
+      <div className="container-page py-16">
+        <LoadingState label="Loading profile" />
+      </div>
+    );
   if (q.isError)
     return (
       <div className="container-page py-16">
-        <ErrorState title="Could not load profile" description="Please try again." onRetry={() => void q.refetch()} />
+        <ErrorState
+          title="Could not load profile"
+          description="Please try again."
+          onRetry={() => void q.refetch()}
+        />
       </div>
     );
 
@@ -46,13 +61,22 @@ function MyProfilePage() {
       <div className="mt-8 flex items-center gap-4">
         <Avatar path={p?.avatar_url} size={72} />
         <div className="min-w-0">
-          <p className="truncate text-xl font-semibold">{p?.username ? `@${p.username}` : "No username yet"}</p>
+          <p className="truncate text-xl font-semibold">
+            {p?.username ? `@${p.username}` : "No username yet"}
+          </p>
           {p?.bio ? <p className="mt-1 text-sm text-muted-foreground">{p.bio}</p> : null}
           {p?.username ? (
-            <Link to="/u/$username" params={{ username: p.username }} className="mt-1 inline-block text-xs text-accent">
+            <Link
+              to="/u/$username"
+              params={{ username: p.username }}
+              className="mt-1 inline-block text-xs text-accent"
+            >
               View public profile
             </Link>
           ) : null}
+          <Link to="/settings/privacy" className="mt-1 block text-xs text-accent">
+            Privacy & data
+          </Link>
         </div>
       </div>
 
@@ -68,7 +92,11 @@ function MyProfilePage() {
               <>
                 <WalletLinker userId={user.id} linked={p.wallet_address} />
                 {p.wallet_address ? <WalletActivity profileId={p.id} /> : null}
-                {p.wallet_address ? <div className="mt-4"><TradePerformance address={p.wallet_address} /></div> : null}
+                {p.wallet_address ? (
+                  <div className="mt-4">
+                    <TradePerformance address={p.wallet_address} />
+                  </div>
+                ) : null}
               </>
             ) : (
               <p className="text-sm text-muted-foreground">Save a username first.</p>
@@ -112,7 +140,8 @@ function MfaSetup() {
     setError(null);
     setBusy(true);
     const { data: all } = await supabase.auth.mfa.listFactors();
-    for (const f of all?.all ?? []) if (f.status === "unverified") await supabase.auth.mfa.unenroll({ factorId: f.id });
+    for (const f of all?.all ?? [])
+      if (f.status === "unverified") await supabase.auth.mfa.unenroll({ factorId: f.id });
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp" });
     setBusy(false);
     if (error) return setError(error.message);
@@ -144,7 +173,9 @@ function MfaSetup() {
     return (
       <div className="space-y-3">
         <p className="text-sm">Authenticator app is on.</p>
-        <Button variant="secondary" size="sm" onClick={() => void remove()} disabled={busy}>Turn off</Button>
+        <Button variant="secondary" size="sm" onClick={() => void remove()} disabled={busy}>
+          Turn off
+        </Button>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
       </div>
     );
@@ -153,16 +184,34 @@ function MfaSetup() {
     <div className="space-y-3">
       {qr ? (
         <>
-          <p className="text-sm text-muted-foreground">Scan with your authenticator app, then enter the 6-digit code.</p>
-          <img src={qr} alt="Authenticator QR code" className="h-40 w-40 rounded-md bg-foreground p-2" />
-          <input inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-            className={inputCls} placeholder="123456" />
-          <Button size="sm" onClick={() => void confirm()} disabled={busy || code.length !== 6}>Confirm</Button>
+          <p className="text-sm text-muted-foreground">
+            Scan with your authenticator app, then enter the 6-digit code.
+          </p>
+          <img
+            src={qr}
+            alt="Authenticator QR code"
+            className="h-40 w-40 rounded-md bg-foreground p-2"
+          />
+          <input
+            inputMode="numeric"
+            maxLength={6}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            className={inputCls}
+            placeholder="123456"
+          />
+          <Button size="sm" onClick={() => void confirm()} disabled={busy || code.length !== 6}>
+            Confirm
+          </Button>
         </>
       ) : (
         <>
-          <p className="text-sm text-muted-foreground">Add an authenticator app as a second sign-in step.</p>
-          <Button variant="secondary" size="sm" onClick={() => void start()} disabled={busy}>Set up</Button>
+          <p className="text-sm text-muted-foreground">
+            Add an authenticator app as a second sign-in step.
+          </p>
+          <Button variant="secondary" size="sm" onClick={() => void start()} disabled={busy}>
+            Set up
+          </Button>
         </>
       )}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
