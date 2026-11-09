@@ -8,6 +8,7 @@ import { IndexingStatus } from "@/components/amphis/IndexingStatus";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
 import { FollowButton } from "@/components/amphis/FollowButton";
+import { ReputationCard } from "@/components/amphis/ReputationCard";
 import { isEvmAddress, normalizeAddress, shortenAddress } from "@/lib/evm/address";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,7 +32,6 @@ export const Route = createFileRoute("/trader/$walletAddress")({
 
 const SECTIONS = [
   { title: "Risk", empty: "No verified trading data yet." },
-  { title: "Reputation", empty: "No verified trading data yet." },
   { title: "Leaderboard position", empty: "No verified trading data yet." },
 ];
 
@@ -111,6 +111,7 @@ function TraderProfile() {
         <div className="grid gap-4 lg:col-span-2">
           <IndexingStatus address={walletAddress} />
           <TradePerformance address={walletAddress} />
+          <ReputationCard address={walletAddress} />
           {SECTIONS.map((s) => (
             <Card key={s.title}>
               <CardHeader title={s.title} />

@@ -32,6 +32,10 @@ const links = [
   { to: "/leaderboard", label: "Leaderboard" },
   { to: "/tokens", label: "Tokens" },
   { to: "/search", label: "Search" },
+  { to: "/portfolio", label: "Portfolio" },
+  { to: "/activity", label: "Activity" },
+  { to: "/watchlist", label: "Watchlist" },
+  { to: "/notifications", label: "Alerts" },
   { to: "/me", label: "My Profile" },
 ] as const;
 
