@@ -13,7 +13,10 @@ function AccountButton() {
   if (!ready) return null;
   if (!user)
     return (
-      <Link to="/auth" className="hidden whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary min-[400px]:inline-block">
+      <Link
+        to="/auth"
+        className="hidden whitespace-nowrap rounded-md border border-border px-3 py-1.5 text-sm hover:bg-secondary min-[400px]:inline-block"
+      >
         Sign in
       </Link>
     );
@@ -27,6 +30,8 @@ function AccountButton() {
 const links = [
   { to: "/explore", label: "Explore" },
   { to: "/leaderboard", label: "Leaderboard" },
+  { to: "/tokens", label: "Tokens" },
+  { to: "/search", label: "Search" },
   { to: "/me", label: "My Profile" },
 ] as const;
 
@@ -84,7 +89,11 @@ export function Navbar() {
               </Link>
             ))}
             {ready && !user ? (
-              <Link to="/auth" onClick={() => setOpen(false)} className="py-3 text-sm text-foreground">
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="py-3 text-sm text-foreground"
+              >
                 Sign in
               </Link>
             ) : null}

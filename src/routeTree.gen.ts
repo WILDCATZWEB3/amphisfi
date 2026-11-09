@@ -14,10 +14,13 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as TokensIndexRouteImport } from './routes/tokens/index'
 import { Route as TraderWalletAddressRouteImport } from './routes/trader.$walletAddress'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
+import { Route as TokensChainIdContractAddressRouteImport } from './routes/tokens/$chainId.$contractAddress'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -43,6 +46,11 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
   id: '/me',
   path: '/me',
@@ -52,6 +60,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const TokensIndexRoute = TokensIndexRouteImport.update({
+  id: '/tokens/',
+  path: '/tokens/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TraderWalletAddressRoute = TraderWalletAddressRouteImport.update({
   id: '/trader/$walletAddress',
@@ -63,26 +76,38 @@ const UUsernameRoute = UUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TokensChainIdContractAddressRoute =
+  TokensChainIdContractAddressRouteImport.update({
+    id: '/tokens/$chainId/$contractAddress',
+    path: '/tokens/$chainId/$contractAddress',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/search': typeof SearchRoute
   '/me': typeof AuthenticatedMeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/tokens/': typeof TokensIndexRoute
+  '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/search': typeof SearchRoute
   '/me': typeof AuthenticatedMeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/tokens': typeof TokensIndexRoute
+  '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,10 +116,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/search': typeof SearchRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/tokens/': typeof TokensIndexRoute
+  '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,20 +131,26 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explore'
     | '/leaderboard'
+    | '/search'
     | '/me'
     | '/onboarding'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/tokens/'
+    | '/tokens/$chainId/$contractAddress'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/explore'
     | '/leaderboard'
+    | '/search'
     | '/me'
     | '/onboarding'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/tokens'
+    | '/tokens/$chainId/$contractAddress'
   id:
     | '__root__'
     | '/'
@@ -124,10 +158,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/explore'
     | '/leaderboard'
+    | '/search'
     | '/_authenticated/me'
     | '/_authenticated/onboarding'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/tokens/'
+    | '/tokens/$chainId/$contractAddress'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,8 +173,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  SearchRoute: typeof SearchRoute
   TraderWalletAddressRoute: typeof TraderWalletAddressRoute
   UUsernameRoute: typeof UUsernameRoute
+  TokensIndexRoute: typeof TokensIndexRoute
+  TokensChainIdContractAddressRoute: typeof TokensChainIdContractAddressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -177,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/me': {
       id: '/_authenticated/me'
       path: '/me'
@@ -191,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/tokens/': {
+      id: '/tokens/'
+      path: '/tokens'
+      fullPath: '/tokens/'
+      preLoaderRoute: typeof TokensIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trader/$walletAddress': {
       id: '/trader/$walletAddress'
       path: '/trader/$walletAddress'
@@ -203,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/u/$username'
       fullPath: '/u/$username'
       preLoaderRoute: typeof UUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokens/$chainId/$contractAddress': {
+      id: '/tokens/$chainId/$contractAddress'
+      path: '/tokens/$chainId/$contractAddress'
+      fullPath: '/tokens/$chainId/$contractAddress'
+      preLoaderRoute: typeof TokensChainIdContractAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -227,8 +288,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
   LeaderboardRoute: LeaderboardRoute,
+  SearchRoute: SearchRoute,
   TraderWalletAddressRoute: TraderWalletAddressRoute,
   UUsernameRoute: UUsernameRoute,
+  TokensIndexRoute: TokensIndexRoute,
+  TokensChainIdContractAddressRoute: TokensChainIdContractAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

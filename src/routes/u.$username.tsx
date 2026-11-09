@@ -5,6 +5,7 @@ import { Avatar } from "@/components/amphis/Avatar";
 import { Card, CardHeader } from "@/components/amphis/Card";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
+import { FollowButton } from "@/components/amphis/FollowButton";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/u/$username")({
@@ -32,7 +33,7 @@ function UserProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("username, bio, avatar_url, wallet_address, created_at")
+        .select("id, username, bio, avatar_url, wallet_address, created_at, visibility")
         .ilike("username", username)
         .maybeSingle();
       if (error) throw error;
@@ -40,11 +41,20 @@ function UserProfile() {
     },
   });
 
-  if (q.isLoading) return <div className="container-page py-16"><LoadingState label="Loading profile" /></div>;
+  if (q.isLoading)
+    return (
+      <div className="container-page py-16">
+        <LoadingState label="Loading profile" />
+      </div>
+    );
   if (q.isError)
     return (
       <div className="container-page py-16">
-        <ErrorState title="Could not load profile" description="Please try again." onRetry={() => void q.refetch()} />
+        <ErrorState
+          title="Could not load profile"
+          description="Please try again."
+          onRetry={() => void q.refetch()}
+        />
       </div>
     );
   if (!q.data)
@@ -62,6 +72,11 @@ function UserProfile() {
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-semibold">@{p.username}</h1>
           {p.bio ? <p className="mt-1 text-sm text-muted-foreground">{p.bio}</p> : null}
+          {p.id ? (
+            <div className="mt-3">
+              <FollowButton profileId={p.id} />
+            </div>
+          ) : null}
         </div>
       </div>
       <Card className="mt-8">
@@ -69,7 +84,11 @@ function UserProfile() {
         {p.wallet_address ? (
           <div className="space-y-2">
             <WalletAddress address={p.wallet_address} full className="max-w-full" />
-            <Link to="/trader/$walletAddress" params={{ walletAddress: p.wallet_address }} className="text-xs text-accent">
+            <Link
+              to="/trader/$walletAddress"
+              params={{ walletAddress: p.wallet_address }}
+              className="text-xs text-accent"
+            >
               View trading profile
             </Link>
           </div>

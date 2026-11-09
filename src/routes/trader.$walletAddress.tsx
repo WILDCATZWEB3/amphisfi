@@ -7,6 +7,7 @@ import { TradePerformance } from "@/components/amphis/TradePerformance";
 import { IndexingStatus } from "@/components/amphis/IndexingStatus";
 import { WalletAddress } from "@/components/amphis/WalletAddress";
 import { EmptyState, ErrorState, LoadingState } from "@/components/amphis/States";
+import { FollowButton } from "@/components/amphis/FollowButton";
 import { isEvmAddress, normalizeAddress, shortenAddress } from "@/lib/evm/address";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -44,7 +45,7 @@ function TraderProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("wallets")
-        .select("profiles(username, bio, avatar_url, created_at)")
+        .select("profiles(id, username, bio, avatar_url, created_at, visibility)")
         .eq("chain", "robinhood")
         .eq("address_normalized", normalizeAddress(walletAddress))
         .maybeSingle();
@@ -96,6 +97,9 @@ function TraderProfile() {
                 <p className="text-xs text-muted-foreground">Bio</p>
                 <p className="text-sm">{profileQuery.data.bio ?? "Not set"}</p>
               </div>
+              {profileQuery.data.id && profileQuery.data.visibility !== "private" ? (
+                <FollowButton profileId={profileQuery.data.id} />
+              ) : null}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
