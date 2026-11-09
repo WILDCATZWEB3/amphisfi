@@ -44,8 +44,39 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+async function healthResponse(): Promise<Response> {
+  const body: Record<string, unknown> = {
+    ok: true,
+    service: "amphis",
+    time: new Date().toISOString(),
+  };
+  try {
+    const { rpcConfigStatus, getLatestBlockNumber } = await import("./lib/rpc/provider.server");
+    body.rpc = rpcConfigStatus();
+    const block = await getLatestBlockNumber();
+    body.chain = block.ok
+      ? { reachable: true, blockNumber: block.blockNumber, provider: block.provider }
+      : { reachable: false, reason: block.reason };
+    if (!block.ok) body.ok = false;
+  } catch (e) {
+    body.ok = false;
+    body.chain = {
+      reachable: false,
+      reason: e instanceof Error ? e.message : "health check failed",
+    };
+  }
+  return new Response(JSON.stringify(body), {
+    status: body.ok ? 200 : 503,
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const path = new URL(request.url).pathname;
+    if (path === "/api/health" || path === "/healthz") {
+      return healthResponse();
+    }
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

@@ -121,18 +121,24 @@ export const getWalletPortfolio = createServerFn({ method: "GET" })
         ? positions.reduce((s, p) => s + p.costBasisUsd, 0)
         : Number(snap.open_cost_basis_usd);
 
+    const address = wallet.address_normalized ?? normalizeAddress(wallet.address);
+    const { getNativeEthBalance } = await import("@/lib/rpc/provider.server");
+    const eth = await getNativeEthBalance(address);
+
     return {
       wallet: {
         id: wallet.id,
-        address: wallet.address_normalized ?? normalizeAddress(wallet.address),
+        address,
         syncStatus: wallet.sync_status,
         backfillComplete: wallet.backfill_complete,
         ownershipVerified: wallet.ownership_verified,
         lastSyncedAt: wallet.last_synced_at,
       },
-      // Live ETH balance is not stored; show unavailable rather than guessing.
-      ethBalance: null as number | null,
-      ethBalanceAvailable: false,
+      ethBalance: eth.available ? Number(eth.balanceEth) : null,
+      ethBalanceAvailable: eth.available,
+      ethBalanceWei: eth.available ? eth.balanceWei : null,
+      ethBalanceProvider: eth.available ? eth.provider : null,
+      ethBalanceReason: eth.available ? null : eth.reason,
       positions,
       summary: {
         openCostBasisUsd: Number.isFinite(openCost) ? openCost : null,
