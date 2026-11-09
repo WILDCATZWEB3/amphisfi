@@ -19,6 +19,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -28,6 +29,7 @@ import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authentica
 import { Route as TokensIndexRouteImport } from './routes/tokens/index'
 import { Route as TraderWalletAddressRouteImport } from './routes/trader.$walletAddress'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
+import { Route as AuthenticatedSettingsPrivacyRouteImport } from './routes/_authenticated/settings/privacy'
 import { Route as TokensChainIdContractAddressRouteImport } from './routes/tokens/$chainId.$contractAddress'
 
 const IndexRoute = IndexRouteImport.update({
@@ -79,6 +81,11 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
   id: '/alerts',
   path: '/alerts',
@@ -125,6 +132,12 @@ const UUsernameRoute = UUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsPrivacyRoute =
+  AuthenticatedSettingsPrivacyRouteImport.update({
+    id: '/settings/privacy',
+    path: '/settings/privacy',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const TokensChainIdContractAddressRoute =
   TokensChainIdContractAddressRouteImport.update({
     id: '/tokens/$chainId/$contractAddress',
@@ -142,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/activity': typeof AuthenticatedActivityRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/alerts': typeof AuthenticatedAlertsRoute
   '/me': typeof AuthenticatedMeRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -151,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
   '/tokens/': typeof TokensIndexRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRoutesByTo {
@@ -163,6 +178,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/activity': typeof AuthenticatedActivityRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/alerts': typeof AuthenticatedAlertsRoute
   '/me': typeof AuthenticatedMeRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -172,6 +188,7 @@ export interface FileRoutesByTo {
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
   '/tokens': typeof TokensIndexRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRoutesById {
@@ -186,6 +203,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -195,6 +213,7 @@ export interface FileRoutesById {
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
   '/tokens/': typeof TokensIndexRoute
+  '/_authenticated/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRouteTypes {
@@ -209,6 +228,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/activity'
+    | '/admin'
     | '/alerts'
     | '/me'
     | '/notifications'
@@ -218,6 +238,7 @@ export interface FileRouteTypes {
     | '/trader/$walletAddress'
     | '/u/$username'
     | '/tokens/'
+    | '/settings/privacy'
     | '/tokens/$chainId/$contractAddress'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -230,6 +251,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/activity'
+    | '/admin'
     | '/alerts'
     | '/me'
     | '/notifications'
@@ -239,6 +261,7 @@ export interface FileRouteTypes {
     | '/trader/$walletAddress'
     | '/u/$username'
     | '/tokens'
+    | '/settings/privacy'
     | '/tokens/$chainId/$contractAddress'
   id:
     | '__root__'
@@ -252,6 +275,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/_authenticated/activity'
+    | '/_authenticated/admin'
     | '/_authenticated/alerts'
     | '/_authenticated/me'
     | '/_authenticated/notifications'
@@ -261,6 +285,7 @@ export interface FileRouteTypes {
     | '/trader/$walletAddress'
     | '/u/$username'
     | '/tokens/'
+    | '/_authenticated/settings/privacy'
     | '/tokens/$chainId/$contractAddress'
   fileRoutesById: FileRoutesById
 }
@@ -352,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/alerts': {
       id: '/_authenticated/alerts'
       path: '/alerts'
@@ -415,6 +447,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings/privacy': {
+      id: '/_authenticated/settings/privacy'
+      path: '/settings/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AuthenticatedSettingsPrivacyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/tokens/$chainId/$contractAddress': {
       id: '/tokens/$chainId/$contractAddress'
       path: '/tokens/$chainId/$contractAddress'
@@ -427,22 +466,26 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
   AuthenticatedWatchlistRoute: typeof AuthenticatedWatchlistRoute
+  AuthenticatedSettingsPrivacyRoute: typeof AuthenticatedSettingsPrivacyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
   AuthenticatedWatchlistRoute: AuthenticatedWatchlistRoute,
+  AuthenticatedSettingsPrivacyRoute: AuthenticatedSettingsPrivacyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

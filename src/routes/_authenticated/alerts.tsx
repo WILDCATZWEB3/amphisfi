@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/alerts")({
       {
         name: "description",
         content:
-          "Wallet activity alerts from indexed trades. Price alerts are saved but not continuously evaluated yet.",
+          "Wallet activity alerts from indexed trades. Price alerts are evaluated by the worker when DefiLlama returns a real Robinhood token price.",
       },
     ],
   }),
