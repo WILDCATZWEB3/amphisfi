@@ -23,7 +23,7 @@ function Page() {
           decisions.
         </p>
         <p>
-          <strong class="text-foreground">Risk disclosure:</strong> Digital assets and tokenized
+          <strong className="text-foreground">Risk disclosure:</strong> Digital assets and tokenized
           instruments can lose value rapidly. Indexing may be partial; classifications may be wrong;
           prices may be missing. Do not treat Amphis metrics as brokerage statements or ownership
           guarantees.

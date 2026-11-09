@@ -27,27 +27,27 @@ function Page() {
           metrics from that evidence.
         </p>
         <p>
-          Amphis is <strong class="text-foreground">not</strong> a broker, custodian, or execution
-          venue. It does not sign or broadcast transactions for you. It is{" "}
-          <strong class="text-foreground">
+          Amphis is <strong className="text-foreground">not</strong> a broker, custodian, or
+          execution venue. It does not sign or broadcast transactions for you. It is{" "}
+          <strong className="text-foreground">
             not affiliated with, endorsed by, or partnered with Robinhood Markets, Inc.
           </strong>{" "}
           or its affiliates unless a separate written agreement exists.
         </p>
         <p>
-          <strong class="text-foreground">Data sources:</strong> Robinhood Chain RPC via Alchemy
+          <strong className="text-foreground">Data sources:</strong> Robinhood Chain RPC via Alchemy
           (when configured), DefiLlama historical/current prices where coverage exists, and
           user-provided profile data (username, bio, avatar). Missing prices are shown as
           unavailable — never invented as zero.
         </p>
         <p>
-          <strong class="text-foreground">Methodology:</strong> Trade detection links to transaction
-          hashes and logs. Cost basis uses first-in, first-out (FIFO). Leaderboards exclude wallets
-          with incomplete indexing or insufficient price coverage. Reputation v1 is explainable,
-          versioned, and requires minimum history.
+          <strong className="text-foreground">Methodology:</strong> Trade detection links to
+          transaction hashes and logs. Cost basis uses first-in, first-out (FIFO). Leaderboards
+          exclude wallets with incomplete indexing or insufficient price coverage. Reputation v1 is
+          explainable, versioned, and requires minimum history.
         </p>
         <p>
-          <strong class="text-foreground">Risk:</strong> Blockchain analytics can be incomplete.
+          <strong className="text-foreground">Risk:</strong> Blockchain analytics can be incomplete.
           Past performance is not a guarantee of future results. Tokens, including tokenized assets,
           involve substantial risk of loss.
         </p>

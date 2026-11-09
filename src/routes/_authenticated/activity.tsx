@@ -33,7 +33,8 @@ function ActivityPage() {
 
   useEffect(() => {
     if (!walletId && walletsQ.data?.wallets?.length) {
-      setWalletId(walletsQ.data.wallets[0].id);
+      const first = walletsQ.data.wallets[0];
+      if (first) setWalletId(first.id);
     }
   }, [walletsQ.data, walletId]);
 
