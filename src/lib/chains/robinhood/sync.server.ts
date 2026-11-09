@@ -1,3 +1,4 @@
+import { publicRobinhoodRpcFallback, resolveRobinhoodRpcUrl } from "@/lib/rpc/resolve-url";
 /**
  * Robinhood Chain wallet indexer (server-only). Resumable and idempotent.
  *
@@ -19,7 +20,7 @@ const MAX_TX_PER_BATCH = 40;
 const log = (msg: string, extra: Record<string, unknown> = {}) => console.log(`[rh-sync] ${msg}`, JSON.stringify(extra));
 
 export function rpcEndpoint() {
-  return process.env["ROBINHOOD_RPC_URL"] || "https://rpc.mainnet.chain.robinhood.com";
+  return resolveRobinhoodRpcUrl(process.env["ROBINHOOD_RPC_URL"]) || publicRobinhoodRpcFallback();
 }
 
 function client() {

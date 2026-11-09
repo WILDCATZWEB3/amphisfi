@@ -1,11 +1,16 @@
 /**
  * Server-only Robinhood Chain RPC provider.
- * Prefer ROBINHOOD_RPC_URL (Alchemy). Fall back to public RPC.
+ * Prefer ROBINHOOD_RPC_URL (Alchemy full URL or bare key). Fall back to public RPC.
  * Never expose keys or this module to the client bundle.
  */
 import { createPublicClient, formatEther, http, type Address } from "viem";
 
 import { robinhoodChain } from "@/lib/chains/robinhood/config";
+import {
+  describeRpcConfig,
+  publicRobinhoodRpcFallback,
+  resolveRobinhoodRpcUrl,
+} from "@/lib/rpc/resolve-url";
 
 export type RpcProviderId = "alchemy_or_configured" | "public_fallback";
 
@@ -23,12 +28,11 @@ export type EthBalanceResult =
     };
 
 function primaryUrl(): string | null {
-  const u = process.env["ROBINHOOD_RPC_URL"]?.trim();
-  return u || null;
+  return resolveRobinhoodRpcUrl(process.env["ROBINHOOD_RPC_URL"]);
 }
 
 function fallbackUrl(): string {
-  return "https://rpc.mainnet.chain.robinhood.com";
+  return publicRobinhoodRpcFallback();
 }
 
 function makeClient(url: string) {
@@ -95,18 +99,12 @@ export async function getLatestBlockNumber(): Promise<
 
 /** Health helper: does not reveal secrets. */
 export function rpcConfigStatus() {
+  const raw = process.env["ROBINHOOD_RPC_URL"];
+  const described = describeRpcConfig(raw);
   return {
-    configuredPrimary: Boolean(primaryUrl()),
-    // Never return the actual URL if it contains a key path segment beyond host.
-    primaryHost: primaryUrl()
-      ? (() => {
-          try {
-            return new URL(primaryUrl()!).host;
-          } catch {
-            return "invalid-url";
-          }
-        })()
-      : null,
+    configuredPrimary: described.configured,
+    mode: described.mode,
+    primaryHost: described.host,
     fallbackHost: "rpc.mainnet.chain.robinhood.com",
   };
 }

@@ -1,3 +1,4 @@
+import { publicRobinhoodRpcFallback, resolveRobinhoodRpcUrl } from "@/lib/rpc/resolve-url";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -42,7 +43,7 @@ export const linkWallet = createServerFn({ method: "POST" })
     const normalized = address.toLowerCase();
     const client = createPublicClient({
       chain: robinhoodChain,
-      transport: http(process.env["ROBINHOOD_RPC_URL"] || "https://rpc.mainnet.chain.robinhood.com"),
+      transport: http(resolveRobinhoodRpcUrl(process.env["ROBINHOOD_RPC_URL"]) || publicRobinhoodRpcFallback()),
     });
     // Supports regular wallets and smart-contract wallets (ERC-1271).
     const ok = await client
