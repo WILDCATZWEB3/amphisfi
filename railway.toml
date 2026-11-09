@@ -1,23 +1,16 @@
-# Amphis Railway deployment sketch — NOT claimed live.
-# Connect this GitHub repo in Railway. See docs/DEPLOYMENT.md.
-# Recommended: two services from the same repo — `web` and `worker`.
+# Amphis Railway config — NOT claimed LIVE VERIFIED.
+# One GitHub repo → two Railway services (web + worker). See docs/DEPLOYMENT.md.
 
 [build]
 builder = "NIXPACKS"
 buildCommand = "bun install --frozen-lockfile && bun run build"
+watchPatterns = ["src/**", "scripts/**", "package.json", "drizzle/**"]
 
 [deploy]
-# Default = web. For the worker service, override startCommand to: bun run worker
+# Default service = web. Create a second Railway service from the same repo
+# and override its start command to `bun run worker` (no public domain).
 startCommand = "bun run preview --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
-
-# Service split (configure in Railway dashboard / service settings):
-# web:
-#   startCommand = bun run preview --host 0.0.0.0 --port $PORT
-#   healthcheckPath = /api/health
-# worker:
-#   startCommand = bun run worker
-#   no public domain / no HTTP healthcheck required
-#   same secrets as web (SUPABASE_*, ROBINHOOD_RPC_URL, AMPHIS_ADMIN_USER_IDS optional)
+restartPolicyMaxRetries = 5

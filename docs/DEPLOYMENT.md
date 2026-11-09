@@ -18,6 +18,15 @@
 | `ROBINHOOD_RPC_URL`         | strongly recommended | Alchemy (or other) Robinhood Chain RPC; used for sync + live ETH balance                       |
 | `VITE_ROBINHOOD_CHAIN_ID`   | optional             | Defaults to `4663`                                                                             |
 | `VITE_ROBINHOOD_RPC_URL`    | optional             | **Public** RPC for wallet `wallet_addEthereumChain` only — do not put Alchemy keys in `VITE_*` |
+| `AMPHIS_ADMIN_USER_IDS`     | optional             | Comma-separated auth user UUIDs for `/admin`                                                   |
+| `EMAIL_PROVIDER`            | optional             | Set to `resend` to enable email; omit/`none` keeps email off                                   |
+| `RESEND_API_KEY`            | if email on          | Resend API key — never commit                                                                  |
+| `EMAIL_FROM`                | if email on          | Verified sender address for Resend                                                             |
+| `PUBLIC_API_RATE_LIMIT`     | optional             | Max public server-fn calls per IP per window (default 60)                                      |
+| `PUBLIC_API_RATE_WINDOW_MS` | optional             | Rate-limit window ms (default 60000)                                                           |
+| `WORKER_ID`                 | optional             | Worker instance id                                                                             |
+| `WORKER_LOOP_MS`            | optional             | Idle sleep between ticks (default 5000)                                                        |
+| `WORKER_BUDGET_MS`          | optional             | Max processing time per tick (default 25000)                                                   |
 
 OAuth (Google / X) is configured in Lovable/Supabase dashboard callback URLs for the production domain.
 
@@ -75,42 +84,47 @@ Until those steps are done and verified, deployment status remains **not LIVE VE
 
 Do not use browser timers as an alert or indexing engine.
 
-## Worker service (Phase 4)
+## Railway: web + worker (exact setup)
 
-Run continuous wallet sync + price-alert evaluation as a **separate** Railway service from the same repo.
+**Status:** documented and code-ready. **Not LIVE VERIFIED** — no production Railway deploy was performed in this branch.
 
-### Run command
+### 1) Create two services from the same GitHub repo
+
+| Service    | Root config                                           | Start command                                 | Public domain | Healthcheck           |
+| ---------- | ----------------------------------------------------- | --------------------------------------------- | ------------- | --------------------- |
+| **web**    | `railway.toml`                                        | `bun run preview --host 0.0.0.0 --port $PORT` | yes           | `/api/health` (30s)   |
+| **worker** | same repo; override start (see `railway.worker.toml`) | `bun run worker`                              | **no**        | none (process worker) |
+
+Build command (both): `bun install --frozen-lockfile && bun run build`
+
+### 2) Shared environment variables (set on both services)
+
+Required: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ROBINHOOD_RPC_URL`  
+Optional: `AMPHIS_ADMIN_USER_IDS`, `EMAIL_PROVIDER`, `RESEND_API_KEY`, `EMAIL_FROM`, worker tuning vars, rate-limit vars.
+
+### 3) Database
+
+Apply additive migrations through **`0012_phase5_worker_protocols_email.sql`** before relying on atomic claim, protocols, or email prefs.
+
+### 4) Worker behaviour (Phase 5)
+
+- Atomic claim via Postgres `claim_worker_job` (`FOR UPDATE SKIP LOCKED` + lease)
+- Lease timeout recovers stuck `running` jobs
+- Per-wallet coordination (no concurrent sync of the same wallet)
+- Retries + exponential backoff
+- Graceful SIGINT/SIGTERM shutdown
+- Price alerts only when DefiLlama returns a real price
+
+### 5) Email
+
+Email is **off** unless `EMAIL_PROVIDER=resend` **and** `RESEND_API_KEY` **and** `EMAIL_FROM` are set, **and** the user opts in (`notification_preferences.email`). Missing config never sends.
+
+### 6) Local run commands
 
 ```bash
-bun run worker
-# equivalent: bun run scripts/worker.ts
+bun install --frozen-lockfile
+bun run build
+bun run preview --host 0.0.0.0 --port ${PORT:-4173}   # web
+bun run worker                                         # worker
+bun test src/test
 ```
-
-Environment (same as web, plus optional):
-
-| Variable                    | Required             | Purpose                                          |
-| --------------------------- | -------------------- | ------------------------------------------------ |
-| `SUPABASE_URL`              | yes                  | DB                                               |
-| `SUPABASE_SERVICE_ROLE_KEY` | yes                  | Job claim / sync writes                          |
-| `ROBINHOOD_RPC_URL`         | strongly recommended | Wallet sync RPC                                  |
-| `WORKER_ID`                 | optional             | Worker instance id (auto-generated)              |
-| `WORKER_LOOP_MS`            | optional             | Idle sleep between ticks (default 5000)          |
-| `WORKER_BUDGET_MS`          | optional             | Max processing time per tick (default 25000)     |
-| `AMPHIS_ADMIN_USER_IDS`     | optional             | Comma-separated Supabase user UUIDs for `/admin` |
-
-### Behaviour
-
-- DB-backed `worker_jobs` with queued/running/completed/failed, retries + exponential backoff
-- Unique running sync per wallet (no concurrent processing of the same wallet)
-- Graceful shutdown on SIGINT/SIGTERM
-- `wallet_sync` jobs call existing `syncRobinhoodWallet` + trade detect / value / PnL within a processing budget
-- `price_alerts` jobs call DefiLlama `currentPrices` for Robinhood tokens; **if price is null, the alert is not triggered** (skipped, never invented)
-
-### Railway web + worker split
-
-1. Create service **web** — build as in this file; start `bun run preview --host 0.0.0.0 --port $PORT`; health `/api/health`
-2. Create service **worker** — same build; start `bun run worker`; no public HTTP
-3. Apply migrations `0008`–`0011` on the database before relying on jobs/admin/privacy columns
-4. Set `AMPHIS_ADMIN_USER_IDS` (or insert into `admin_roles`) before using `/admin`
-
-**Status:** code + docs only — not claimed LIVE VERIFIED on Railway.

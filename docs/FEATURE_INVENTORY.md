@@ -86,3 +86,19 @@ Next.js monorepo, Railway multi-service deploy, reputation engine, watchlist UI,
 ## Explicitly not claimed in Phase 4
 
 Railway LIVE VERIFIED deploy, email notifications, protocol registry, Redis, WalletConnect cloud id, production OAuth verification, merging to `main`.
+
+## Phase 5 additions
+
+| Feature                        | Artifacts                                                                   |
+| ------------------------------ | --------------------------------------------------------------------------- |
+| Railway web+worker exact setup | `railway.toml`, `railway.worker.toml`, `docs/DEPLOYMENT.md`                 |
+| Atomic worker claim + lease    | migration 0012 `claim_worker_job`, `src/lib/worker/claim.ts`, tests         |
+| Bare Alchemy key → RPC URL     | `src/lib/rpc/resolve-url.ts` (never logs key)                               |
+| Email channel (opt-in)         | `src/lib/email/provider.ts` — Resend; off without config                    |
+| Protocol registry              | `/protocols`, verified Uniswap SDK RH contracts only                        |
+| Public rate limits             | `publicRateLimit` on explore/leaderboard/search/tokens/reputation/protocols |
+| tsc cleanups                   | className, optional chaining, index access, exclude bun tests from tsc      |
+
+## Explicitly not claimed in Phase 5
+
+Railway LIVE VERIFIED deploy, shared Redis rate limits, Morpho/other protocol contracts without cited RH addresses, email delivery LIVE VERIFIED, merge to main.

@@ -44,7 +44,7 @@ function TokenDetailPage() {
       <div className="container-page py-16">
         <EmptyState
           title="Token not found"
-          description={q.data && "reason" in q.data ? q.data.reason : undefined}
+          description={q.data && "reason" in q.data ? q.data.reason : "Token not in indexed registry yet."}
         />
       </div>
     );

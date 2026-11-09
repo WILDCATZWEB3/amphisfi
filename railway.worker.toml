@@ -1,0 +1,14 @@
+# Optional reference for the worker Railway service.
+# In the Railway dashboard: New Service → same repo → set start command below.
+# Or: railway up --service worker with this file as config if your CLI supports it.
+# NOT claimed LIVE VERIFIED.
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "bun install --frozen-lockfile && bun run build"
+
+[deploy]
+startCommand = "bun run worker"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+# No healthcheckPath — worker is not an HTTP service.

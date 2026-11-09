@@ -76,12 +76,13 @@ export const getNotificationPreferences = createServerFn({ method: "GET" })
     const profileId = await myProfileId(context.supabase, context.userId);
     const { data } = await context.supabase
       .from("notification_preferences")
-      .select("follows,wallet_sync,updated_at")
+      .select("follows,wallet_sync,email,updated_at")
       .eq("profile_id", profileId)
       .maybeSingle();
     return {
       follows: data?.follows ?? true,
       walletSync: data?.wallet_sync ?? true,
+      email: data?.email ?? false,
       updatedAt: data?.updated_at ?? null,
     };
   });
@@ -93,6 +94,7 @@ export const updateNotificationPreferences = createServerFn({ method: "POST" })
       .object({
         follows: z.boolean().optional(),
         walletSync: z.boolean().optional(),
+        email: z.boolean().optional(),
       })
       .parse(d),
   )
@@ -102,6 +104,7 @@ export const updateNotificationPreferences = createServerFn({ method: "POST" })
       profile_id: profileId,
       follows: data.follows ?? true,
       wallet_sync: data.walletSync ?? true,
+      email: data.email ?? false,
       updated_at: new Date().toISOString(),
     });
     if (error) throw error;

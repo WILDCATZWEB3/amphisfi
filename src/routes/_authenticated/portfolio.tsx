@@ -42,7 +42,7 @@ function PortfolioPage() {
   useEffect(() => {
     if (!walletId && walletsQ.data?.wallets?.length) {
       const primary = walletsQ.data.wallets.find((w) => w.is_primary) ?? walletsQ.data.wallets[0];
-      setWalletId(primary.id);
+      if (primary) setWalletId(primary.id);
     }
   }, [walletsQ.data, walletId]);
 

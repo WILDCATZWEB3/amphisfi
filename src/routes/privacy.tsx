@@ -24,10 +24,10 @@ function Page() {
           rules.
         </p>
         <p>
-          <strong class="text-foreground">Wallet privacy:</strong> On-chain activity is public by
-          nature. Linking a wallet associates that address with your Amphis profile for analytics.
-          Ownership verification uses a signature challenge and is distinct from merely connecting a
-          wallet. Unverified wallets are never labeled ownership-verified.
+          <strong className="text-foreground">Wallet privacy:</strong> On-chain activity is public
+          by nature. Linking a wallet associates that address with your Amphis profile for
+          analytics. Ownership verification uses a signature challenge and is distinct from merely
+          connecting a wallet. Unverified wallets are never labeled ownership-verified.
         </p>
         <p>
           We do not sell personal data. Server credentials (Alchemy, Supabase service role) stay on

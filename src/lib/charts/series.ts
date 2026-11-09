@@ -62,8 +62,8 @@ export function buildCumulativePnlSeries(
 
   if (!usable.length) return [];
 
-  const first = opts?.fromDay ?? usable[0].day;
-  const last = opts?.toDay ?? usable[usable.length - 1].day;
+  const first = opts?.fromDay ?? usable[0]!.day;
+  const last = opts?.toDay ?? usable[usable.length - 1]!.day;
   const byDay = new Map<string, number>();
   for (const u of usable) {
     byDay.set(u.day, (byDay.get(u.day) ?? 0) + u.pnl);
@@ -96,10 +96,13 @@ export function buildTradeActivitySeries(
     .filter(Boolean)
     .sort();
   if (!days.length) return [];
-  const first = opts?.fromDay ?? days[0];
-  const last = opts?.toDay ?? days[days.length - 1];
+  const first = opts?.fromDay ?? days[0]!;
+  const last = opts?.toDay ?? days[days.length - 1]!;
   const counts = new Map<string, number>();
-  for (const d of days) counts.set(d, (counts.get(d) ?? 0) + 1);
+  for (const d of days) {
+    if (!d) continue;
+    counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
   return eachDay(first, last).map((date) => ({
     date,
     tradeCount: counts.get(date) ?? 0,

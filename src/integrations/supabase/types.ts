@@ -1082,6 +1082,99 @@ export type Database = {
           },
         ];
       };
+
+      protocols: {
+        Row: {
+          category: string
+          chain_id: number
+          created_at: string
+          docs_url: string | null
+          id: string
+          name: string
+          notes: string | null
+          slug: string
+          source: string
+          source_url: string
+          updated_at: string
+          verification_status: string
+          website_url: string | null
+        }
+        Insert: {
+          category: string
+          chain_id?: number
+          created_at?: string
+          docs_url?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          slug: string
+          source: string
+          source_url: string
+          updated_at?: string
+          verification_status?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string
+          chain_id?: number
+          created_at?: string
+          docs_url?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          slug?: string
+          source?: string
+          source_url?: string
+          updated_at?: string
+          verification_status?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      protocol_contracts: {
+        Row: {
+          address: string
+          address_normalized: string
+          chain_id: number
+          created_at: string
+          id: string
+          protocol_id: string
+          role: string
+          source: string
+          source_url: string
+        }
+        Insert: {
+          address: string
+          address_normalized: string
+          chain_id?: number
+          created_at?: string
+          id?: string
+          protocol_id: string
+          role: string
+          source: string
+          source_url: string
+        }
+        Update: {
+          address?: string
+          address_normalized?: string
+          chain_id?: number
+          created_at?: string
+          id?: string
+          protocol_id?: string
+          role?: string
+          source?: string
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protocol_contracts_protocol_id_fkey"
+            columns: ["protocol_id"]
+            isOneToOne: false
+            referencedRelation: "protocols"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_roles: {
         Row: { created_at: string; created_by: string | null; role: string; user_id: string }
         Insert: { created_at?: string; created_by?: string | null; role?: string; user_id: string }
@@ -1102,6 +1195,7 @@ export type Database = {
           id: string
           kind: string
           last_error: string | null
+          lease_expires_at: string | null
           locked_at: string | null
           locked_by: string | null
           max_attempts: number
@@ -1118,6 +1212,7 @@ export type Database = {
           id?: string
           kind: string
           last_error?: string | null
+          lease_expires_at?: string | null
           locked_at?: string | null
           locked_by?: string | null
           max_attempts?: number
@@ -1134,6 +1229,7 @@ export type Database = {
           id?: string
           kind?: string
           last_error?: string | null
+          lease_expires_at?: string | null
           locked_at?: string | null
           locked_by?: string | null
           max_attempts?: number
@@ -1276,18 +1372,21 @@ export type Database = {
       };
       notification_preferences: {
         Row: {
+          email: boolean
           follows: boolean
           profile_id: string
           updated_at: string
           wallet_sync: boolean
         }
         Insert: {
+          email?: boolean
           follows?: boolean
           profile_id: string
           updated_at?: string
           wallet_sync?: boolean
         }
         Update: {
+          email?: boolean
           follows?: boolean
           profile_id?: string
           updated_at?: string
@@ -1601,6 +1700,26 @@ export type Database = {
     Functions: {
       check_username: { Args: { _u: string }; Returns: string };
       is_reserved_username: { Args: { _u: string }; Returns: boolean };
+      claim_worker_job: {
+        Args: { p_worker_id: string; p_lease_seconds?: number };
+        Returns: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          lease_expires_at: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          payload: Json
+          run_after: string
+          status: string
+          updated_at: string
+          wallet_id: string | null
+        }
+      };
     };
     Enums: {
       [_ in never]: never;

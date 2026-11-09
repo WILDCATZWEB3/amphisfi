@@ -41,9 +41,30 @@ export async function enqueueJob(input: {
   return data.id as string;
 }
 
-export async function claimNextJob(workerId: string) {
+export async function claimNextJob(workerId: string, leaseSeconds = 120) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const now = new Date().toISOString();
+  const { leaseExpiresAtIso } = await import("./claim");
+
+  // Prefer atomic Postgres claim (SKIP LOCKED + lease). Requires migration 0012.
+  const { data: rpcRows, error: rpcErr } = await supabaseAdmin.rpc("claim_worker_job", {
+    p_worker_id: workerId,
+    p_lease_seconds: leaseSeconds,
+  });
+  if (!rpcErr) {
+    // rpc may return a row object, array, or null
+    const row = Array.isArray(rpcRows) ? rpcRows[0] : rpcRows;
+    if (row && typeof row === "object" && "id" in (row as object))
+      return row as Record<string, unknown>;
+    return null;
+  }
+
+  // Fallback (pre-0012 or RPC missing): optimistic compare-and-set + lease, still status=queued guard.
+  console.log(
+    "[worker] claim_worker_job RPC unavailable; using optimistic fallback",
+    rpcErr.message,
+  );
+  const nowMs = Date.now();
+  const now = new Date(nowMs).toISOString();
   const { data: candidates, error } = await supabaseAdmin
     .from("worker_jobs")
     .select("*")
@@ -57,12 +78,15 @@ export async function claimNextJob(workerId: string) {
     if (job.kind === "wallet_sync" && job.wallet_id) {
       const { data: running } = await supabaseAdmin
         .from("worker_jobs")
-        .select("id")
+        .select("id,lease_expires_at")
         .eq("kind", "wallet_sync")
         .eq("wallet_id", job.wallet_id)
         .eq("status", "running")
         .maybeSingle();
-      if (running) continue;
+      if (running) {
+        const exp = (running as { lease_expires_at?: string | null }).lease_expires_at;
+        if (!exp || Date.parse(exp) >= nowMs) continue;
+      }
     }
 
     const { data: claimed, error: cErr } = await supabaseAdmin
@@ -71,6 +95,7 @@ export async function claimNextJob(workerId: string) {
         status: "running",
         locked_at: now,
         locked_by: workerId,
+        lease_expires_at: leaseExpiresAtIso(nowMs, leaseSeconds),
         attempts: (job.attempts ?? 0) + 1,
         updated_at: now,
       })

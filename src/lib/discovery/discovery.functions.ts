@@ -3,8 +3,10 @@ import { z } from "zod";
 
 import { buildExplore, buildLeaderboard } from "./discovery.server";
 import { parseCategory, parsePeriod } from "./periods";
+import { publicRateLimit } from "@/lib/rate-limit/public-middleware";
 
 export const getExploreTraders = createServerFn({ method: "GET" })
+  .middleware([publicRateLimit])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -20,6 +22,7 @@ export const getExploreTraders = createServerFn({ method: "GET" })
   });
 
 export const getLeaderboard = createServerFn({ method: "GET" })
+  .middleware([publicRateLimit])
   .inputValidator((d: unknown) =>
     z
       .object({

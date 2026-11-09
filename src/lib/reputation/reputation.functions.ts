@@ -3,8 +3,10 @@ import { z } from "zod";
 
 import { isEvmAddress, normalizeAddress } from "@/lib/evm/address";
 import { computeReputationV1, REPUTATION_VERSION } from "./score";
+import { publicRateLimit } from "@/lib/rate-limit/public-middleware";
 
 export const getWalletReputation = createServerFn({ method: "GET" })
+  .middleware([publicRateLimit])
   .inputValidator((d: unknown) => z.object({ address: z.string().min(1) }).parse(d))
   .handler(async ({ data }) => {
     if (!isEvmAddress(data.address)) {

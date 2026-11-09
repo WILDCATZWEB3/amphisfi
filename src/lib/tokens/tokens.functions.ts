@@ -2,8 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { isEvmAddress, normalizeAddress } from "@/lib/evm/address";
+import { publicRateLimit } from "@/lib/rate-limit/public-middleware";
 
 export const listIndexedTokens = createServerFn({ method: "GET" })
+  .middleware([publicRateLimit])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -59,6 +61,7 @@ export const listIndexedTokens = createServerFn({ method: "GET" })
   });
 
 export const getIndexedToken = createServerFn({ method: "GET" })
+  .middleware([publicRateLimit])
   .inputValidator((d: unknown) =>
     z
       .object({

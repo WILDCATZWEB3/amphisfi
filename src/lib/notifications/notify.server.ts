@@ -14,7 +14,7 @@ export async function notifyIfEnabled(input: NotifyInput): Promise<boolean> {
 
   const { data: prefs } = await supabaseAdmin
     .from("notification_preferences")
-    .select("follows,wallet_sync")
+    .select("follows,wallet_sync,email")
     .eq("profile_id", input.profileId)
     .maybeSingle();
 
@@ -36,5 +36,30 @@ export async function notifyIfEnabled(input: NotifyInput): Promise<boolean> {
     console.log("[notify] insert failed", error.message);
     return false;
   }
+
+  // Optional email channel — off unless prefs.email && provider configured.
+  try {
+    if (prefs?.email === true) {
+      const { emailProviderStatus, sendEmail } = await import("@/lib/email/provider");
+      const status = emailProviderStatus();
+      if (status.enabled) {
+        const { data: profile } = await supabaseAdmin
+          .from("profiles")
+          .select("user_id")
+          .eq("id", input.profileId)
+          .maybeSingle();
+        if (profile?.user_id) {
+          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(profile.user_id);
+          const to = userData?.user?.email;
+          if (to) {
+            await sendEmail({ to, subject: input.title, text: input.body });
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.log("[notify] email skipped", e instanceof Error ? e.message : e);
+  }
+
   return true;
 }
