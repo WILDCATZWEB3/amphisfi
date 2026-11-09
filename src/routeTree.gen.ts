@@ -11,13 +11,26 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
+import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated/watchlist'
+import { Route as TokensIndexRouteImport } from './routes/tokens/index'
 import { Route as TraderWalletAddressRouteImport } from './routes/trader.$walletAddress'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
+import { Route as AuthenticatedSettingsPrivacyRouteImport } from './routes/_authenticated/settings/privacy'
+import { Route as TokensChainIdContractAddressRouteImport } from './routes/tokens/$chainId.$contractAddress'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -26,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -43,15 +61,66 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
   id: '/me',
   path: '/me',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWatchlistRoute = AuthenticatedWatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const TokensIndexRoute = TokensIndexRouteImport.update({
+  id: '/tokens/',
+  path: '/tokens/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TraderWalletAddressRoute = TraderWalletAddressRouteImport.update({
   id: '/trader/$walletAddress',
@@ -63,81 +132,177 @@ const UUsernameRoute = UUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsPrivacyRoute =
+  AuthenticatedSettingsPrivacyRouteImport.update({
+    id: '/settings/privacy',
+    path: '/settings/privacy',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const TokensChainIdContractAddressRoute =
+  TokensChainIdContractAddressRouteImport.update({
+    id: '/tokens/$chainId/$contractAddress',
+    path: '/tokens/$chainId/$contractAddress',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/privacy': typeof PrivacyRoute
+  '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
+  '/activity': typeof AuthenticatedActivityRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
   '/me': typeof AuthenticatedMeRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/portfolio': typeof AuthenticatedPortfolioRoute
+  '/watchlist': typeof AuthenticatedWatchlistRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/tokens/': typeof TokensIndexRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
+  '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/privacy': typeof PrivacyRoute
+  '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
+  '/activity': typeof AuthenticatedActivityRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
   '/me': typeof AuthenticatedMeRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/portfolio': typeof AuthenticatedPortfolioRoute
+  '/watchlist': typeof AuthenticatedWatchlistRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/tokens': typeof TokensIndexRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
+  '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/privacy': typeof PrivacyRoute
+  '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
+  '/_authenticated/activity': typeof AuthenticatedActivityRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
+  '/_authenticated/watchlist': typeof AuthenticatedWatchlistRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/tokens/': typeof TokensIndexRoute
+  '/_authenticated/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
+  '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
     | '/explore'
     | '/leaderboard'
+    | '/privacy'
+    | '/search'
+    | '/terms'
+    | '/activity'
+    | '/admin'
+    | '/alerts'
     | '/me'
+    | '/notifications'
     | '/onboarding'
+    | '/portfolio'
+    | '/watchlist'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/tokens/'
+    | '/settings/privacy'
+    | '/tokens/$chainId/$contractAddress'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
     | '/explore'
     | '/leaderboard'
+    | '/privacy'
+    | '/search'
+    | '/terms'
+    | '/activity'
+    | '/admin'
+    | '/alerts'
     | '/me'
+    | '/notifications'
     | '/onboarding'
+    | '/portfolio'
+    | '/watchlist'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/tokens'
+    | '/settings/privacy'
+    | '/tokens/$chainId/$contractAddress'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/auth'
     | '/explore'
     | '/leaderboard'
+    | '/privacy'
+    | '/search'
+    | '/terms'
+    | '/_authenticated/activity'
+    | '/_authenticated/admin'
+    | '/_authenticated/alerts'
     | '/_authenticated/me'
+    | '/_authenticated/notifications'
     | '/_authenticated/onboarding'
+    | '/_authenticated/portfolio'
+    | '/_authenticated/watchlist'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/tokens/'
+    | '/_authenticated/settings/privacy'
+    | '/tokens/$chainId/$contractAddress'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  PrivacyRoute: typeof PrivacyRoute
+  SearchRoute: typeof SearchRoute
+  TermsRoute: typeof TermsRoute
   TraderWalletAddressRoute: typeof TraderWalletAddressRoute
   UUsernameRoute: typeof UUsernameRoute
+  TokensIndexRoute: typeof TokensIndexRoute
+  TokensChainIdContractAddressRoute: typeof TokensChainIdContractAddressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +319,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -177,11 +349,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/activity': {
+      id: '/_authenticated/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/me': {
       id: '/_authenticated/me'
       path: '/me'
       fullPath: '/me'
       preLoaderRoute: typeof AuthenticatedMeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/onboarding': {
@@ -190,6 +411,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portfolio': {
+      id: '/_authenticated/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/watchlist': {
+      id: '/_authenticated/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof AuthenticatedWatchlistRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/tokens/': {
+      id: '/tokens/'
+      path: '/tokens'
+      fullPath: '/tokens/'
+      preLoaderRoute: typeof TokensIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/trader/$walletAddress': {
       id: '/trader/$walletAddress'
@@ -205,17 +447,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings/privacy': {
+      id: '/_authenticated/settings/privacy'
+      path: '/settings/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AuthenticatedSettingsPrivacyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/tokens/$chainId/$contractAddress': {
+      id: '/tokens/$chainId/$contractAddress'
+      path: '/tokens/$chainId/$contractAddress'
+      fullPath: '/tokens/$chainId/$contractAddress'
+      preLoaderRoute: typeof TokensChainIdContractAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
+  AuthenticatedWatchlistRoute: typeof AuthenticatedWatchlistRoute
+  AuthenticatedSettingsPrivacyRoute: typeof AuthenticatedSettingsPrivacyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
+  AuthenticatedWatchlistRoute: AuthenticatedWatchlistRoute,
+  AuthenticatedSettingsPrivacyRoute: AuthenticatedSettingsPrivacyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -224,11 +494,17 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
   LeaderboardRoute: LeaderboardRoute,
+  PrivacyRoute: PrivacyRoute,
+  SearchRoute: SearchRoute,
+  TermsRoute: TermsRoute,
   TraderWalletAddressRoute: TraderWalletAddressRoute,
   UUsernameRoute: UUsernameRoute,
+  TokensIndexRoute: TokensIndexRoute,
+  TokensChainIdContractAddressRoute: TokensChainIdContractAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
