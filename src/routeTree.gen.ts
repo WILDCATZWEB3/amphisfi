@@ -26,6 +26,8 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
 import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated/watchlist'
+import { Route as ProtocolsIndexRouteImport } from './routes/protocols/index'
+import { Route as ProtocolsSlugRouteImport } from './routes/protocols/$slug'
 import { Route as TokensIndexRouteImport } from './routes/tokens/index'
 import { Route as TraderWalletAddressRouteImport } from './routes/trader.$walletAddress'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
@@ -117,6 +119,16 @@ const AuthenticatedWatchlistRoute = AuthenticatedWatchlistRouteImport.update({
   path: '/watchlist',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ProtocolsIndexRoute = ProtocolsIndexRouteImport.update({
+  id: '/protocols/',
+  path: '/protocols/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtocolsSlugRoute = ProtocolsSlugRouteImport.update({
+  id: '/protocols/$slug',
+  path: '/protocols/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TokensIndexRoute = TokensIndexRouteImport.update({
   id: '/tokens/',
   path: '/tokens/',
@@ -162,8 +174,10 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
+  '/protocols/$slug': typeof ProtocolsSlugRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/protocols/': typeof ProtocolsIndexRoute
   '/tokens/': typeof TokensIndexRoute
   '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
@@ -185,8 +199,10 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/portfolio': typeof AuthenticatedPortfolioRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
+  '/protocols/$slug': typeof ProtocolsSlugRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/protocols': typeof ProtocolsIndexRoute
   '/tokens': typeof TokensIndexRoute
   '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
@@ -210,8 +226,10 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
   '/_authenticated/watchlist': typeof AuthenticatedWatchlistRoute
+  '/protocols/$slug': typeof ProtocolsSlugRoute
   '/trader/$walletAddress': typeof TraderWalletAddressRoute
   '/u/$username': typeof UUsernameRoute
+  '/protocols/': typeof ProtocolsIndexRoute
   '/tokens/': typeof TokensIndexRoute
   '/_authenticated/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/tokens/$chainId/$contractAddress': typeof TokensChainIdContractAddressRoute
@@ -235,8 +253,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/portfolio'
     | '/watchlist'
+    | '/protocols/$slug'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/protocols/'
     | '/tokens/'
     | '/settings/privacy'
     | '/tokens/$chainId/$contractAddress'
@@ -258,8 +278,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/portfolio'
     | '/watchlist'
+    | '/protocols/$slug'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/protocols'
     | '/tokens'
     | '/settings/privacy'
     | '/tokens/$chainId/$contractAddress'
@@ -282,8 +304,10 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/portfolio'
     | '/_authenticated/watchlist'
+    | '/protocols/$slug'
     | '/trader/$walletAddress'
     | '/u/$username'
+    | '/protocols/'
     | '/tokens/'
     | '/_authenticated/settings/privacy'
     | '/tokens/$chainId/$contractAddress'
@@ -299,8 +323,10 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
+  ProtocolsSlugRoute: typeof ProtocolsSlugRoute
   TraderWalletAddressRoute: typeof TraderWalletAddressRoute
   UUsernameRoute: typeof UUsernameRoute
+  ProtocolsIndexRoute: typeof ProtocolsIndexRoute
   TokensIndexRoute: typeof TokensIndexRoute
   TokensChainIdContractAddressRoute: typeof TokensChainIdContractAddressRoute
 }
@@ -426,6 +452,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWatchlistRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/protocols/': {
+      id: '/protocols/'
+      path: '/protocols'
+      fullPath: '/protocols/'
+      preLoaderRoute: typeof ProtocolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/protocols/$slug': {
+      id: '/protocols/$slug'
+      path: '/protocols/$slug'
+      fullPath: '/protocols/$slug'
+      preLoaderRoute: typeof ProtocolsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tokens/': {
       id: '/tokens/'
       path: '/tokens'
@@ -501,8 +541,10 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
+  ProtocolsSlugRoute: ProtocolsSlugRoute,
   TraderWalletAddressRoute: TraderWalletAddressRoute,
   UUsernameRoute: UUsernameRoute,
+  ProtocolsIndexRoute: ProtocolsIndexRoute,
   TokensIndexRoute: TokensIndexRoute,
   TokensChainIdContractAddressRoute: TokensChainIdContractAddressRoute,
 }

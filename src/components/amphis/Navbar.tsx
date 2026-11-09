@@ -31,6 +31,7 @@ const links = [
   { to: "/explore", label: "Explore" },
   { to: "/leaderboard", label: "Leaderboard" },
   { to: "/tokens", label: "Tokens" },
+  { to: "/protocols", label: "Protocols" },
   { to: "/search", label: "Search" },
   { to: "/portfolio", label: "Portfolio" },
   { to: "/activity", label: "Activity" },
