@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'public';

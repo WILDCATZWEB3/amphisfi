@@ -14,6 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      alert_definitions: {
+        Row: {
+          chain: string | null
+          created_at: string
+          direction: string | null
+          enabled: boolean
+          id: string
+          kind: string
+          label: string | null
+          last_evaluated_at: string | null
+          last_triggered_at: string | null
+          profile_id: string
+          target_price_usd: number | null
+          token_address: string | null
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          chain?: string | null
+          created_at?: string
+          direction?: string | null
+          enabled?: boolean
+          id?: string
+          kind: string
+          label?: string | null
+          last_evaluated_at?: string | null
+          last_triggered_at?: string | null
+          profile_id: string
+          target_price_usd?: number | null
+          token_address?: string | null
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          chain?: string | null
+          created_at?: string
+          direction?: string | null
+          enabled?: boolean
+          id?: string
+          kind?: string
+          label?: string | null
+          last_evaluated_at?: string | null
+          last_triggered_at?: string | null
+          profile_id?: string
+          target_price_usd?: number | null
+          token_address?: string | null
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_definitions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_definitions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_events: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          meta: Json
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       evm_logs: {
         Row: {
           address: string
@@ -513,6 +630,194 @@ export type Database = {
         }
         Relationships: []
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_profile_id: string
+          following_profile_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_profile_id: string
+          following_profile_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_profile_id?: string
+          following_profile_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follows_follower_profile_id_fkey"
+            columns: ["follower_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follows_following_profile_id_fkey"
+            columns: ["following_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboard_entries: {
+        Row: {
+          id: string
+          metric_available: boolean
+          metric_value: number | null
+          profile_id: string | null
+          rank: number
+          snapshot_id: string
+          wallet_id: string
+        }
+        Insert: {
+          id?: string
+          metric_available?: boolean
+          metric_value?: number | null
+          profile_id?: string | null
+          rank: number
+          snapshot_id: string
+          wallet_id: string
+        }
+        Update: {
+          id?: string
+          metric_available?: boolean
+          metric_value?: number | null
+          profile_id?: string | null
+          rank?: number
+          snapshot_id?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_entries_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leaderboard_entries_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_snapshots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leaderboard_entries_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboard_snapshots: {
+        Row: {
+          calculated_at: string
+          category: string
+          entry_count: number
+          id: string
+          methodology: string
+          period: string
+        }
+        Insert: {
+          calculated_at?: string
+          category: string
+          entry_count?: number
+          id?: string
+          methodology: string
+          period: string
+        }
+        Update: {
+          calculated_at?: string
+          category?: string
+          entry_count?: number
+          id?: string
+          methodology?: string
+          period?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          email: boolean
+          follows: boolean
+          profile_id: string
+          updated_at: string
+          wallet_sync: boolean
+        }
+        Insert: {
+          email?: boolean
+          follows?: boolean
+          profile_id: string
+          updated_at?: string
+          wallet_sync?: boolean
+        }
+        Update: {
+          email?: boolean
+          follows?: boolean
+          profile_id?: string
+          updated_at?: string
+          wallet_sync?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          payload: Json
+          profile_id: string
+          read_at: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          payload?: Json
+          profile_id: string
+          read_at?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          payload?: Json
+          profile_id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       performance_snapshots: {
         Row: {
           average_trade_pnl_usd: number | null
@@ -689,6 +994,7 @@ export type Database = {
           updated_at: string
           user_id: string | null
           username: string | null
+          visibility: string
           wallet_address: string | null
         }
         Insert: {
@@ -699,6 +1005,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           username?: string | null
+          visibility?: string
           wallet_address?: string | null
         }
         Update: {
@@ -709,7 +1016,100 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           username?: string | null
+          visibility?: string
           wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      protocol_contracts: {
+        Row: {
+          address: string
+          address_normalized: string
+          chain_id: number
+          created_at: string
+          id: string
+          protocol_id: string
+          role: string
+          source: string
+          source_url: string
+        }
+        Insert: {
+          address: string
+          address_normalized: string
+          chain_id?: number
+          created_at?: string
+          id?: string
+          protocol_id: string
+          role: string
+          source: string
+          source_url: string
+        }
+        Update: {
+          address?: string
+          address_normalized?: string
+          chain_id?: number
+          created_at?: string
+          id?: string
+          protocol_id?: string
+          role?: string
+          source?: string
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protocol_contracts_protocol_id_fkey"
+            columns: ["protocol_id"]
+            isOneToOne: false
+            referencedRelation: "protocols"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      protocols: {
+        Row: {
+          category: string
+          chain_id: number
+          created_at: string
+          docs_url: string | null
+          id: string
+          name: string
+          notes: string | null
+          slug: string
+          source: string
+          source_url: string
+          updated_at: string
+          verification_status: string
+          website_url: string | null
+        }
+        Insert: {
+          category: string
+          chain_id?: number
+          created_at?: string
+          docs_url?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          slug: string
+          source: string
+          source_url: string
+          updated_at?: string
+          verification_status?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string
+          chain_id?: number
+          created_at?: string
+          docs_url?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          slug?: string
+          source?: string
+          source_url?: string
+          updated_at?: string
+          verification_status?: string
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -769,6 +1169,47 @@ export type Database = {
           },
           {
             foreignKeyName: "realized_pnl_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reputation_snapshots: {
+        Row: {
+          breakdown: Json
+          calculated_at: string
+          id: string
+          methodology: string
+          score: number | null
+          score_version: string
+          status: string
+          wallet_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          calculated_at?: string
+          id?: string
+          methodology: string
+          score?: number | null
+          score_version: string
+          status: string
+          wallet_id: string
+        }
+        Update: {
+          breakdown?: Json
+          calculated_at?: string
+          id?: string
+          methodology?: string
+          score?: number | null
+          score_version?: string
+          status?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reputation_snapshots_wallet_id_fkey"
             columns: ["wallet_id"]
             isOneToOne: false
             referencedRelation: "wallets"
@@ -858,6 +1299,92 @@ export type Database = {
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "evm_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trader_metrics: {
+        Row: {
+          average_trade_usd: number | null
+          best_trade_pnl_usd: number | null
+          calculated_at: string
+          capital_deployed_usd: number | null
+          closed_trade_count: number
+          data_completeness: string
+          eligibility_notes: string | null
+          id: string
+          leaderboard_eligible: boolean
+          losing_trades: number
+          performance_ready: boolean
+          period: string
+          priced_trade_count: number
+          realized_pnl_usd: number | null
+          roi: number | null
+          total_pnl_usd: number | null
+          trade_count: number
+          unrealized_pnl_usd: number | null
+          volume_usd: number | null
+          wallet_id: string
+          win_rate: number | null
+          winning_trades: number
+          worst_trade_pnl_usd: number | null
+        }
+        Insert: {
+          average_trade_usd?: number | null
+          best_trade_pnl_usd?: number | null
+          calculated_at?: string
+          capital_deployed_usd?: number | null
+          closed_trade_count?: number
+          data_completeness?: string
+          eligibility_notes?: string | null
+          id?: string
+          leaderboard_eligible?: boolean
+          losing_trades?: number
+          performance_ready?: boolean
+          period: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          roi?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
+          wallet_id: string
+          win_rate?: number | null
+          winning_trades?: number
+          worst_trade_pnl_usd?: number | null
+        }
+        Update: {
+          average_trade_usd?: number | null
+          best_trade_pnl_usd?: number | null
+          calculated_at?: string
+          capital_deployed_usd?: number | null
+          closed_trade_count?: number
+          data_completeness?: string
+          eligibility_notes?: string | null
+          id?: string
+          leaderboard_eligible?: boolean
+          losing_trades?: number
+          performance_ready?: boolean
+          period?: string
+          priced_trade_count?: number
+          realized_pnl_usd?: number | null
+          roi?: number | null
+          total_pnl_usd?: number | null
+          trade_count?: number
+          unrealized_pnl_usd?: number | null
+          volume_usd?: number | null
+          wallet_id?: string
+          win_rate?: number | null
+          winning_trades?: number
+          worst_trade_pnl_usd?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trader_metrics_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
             referencedColumns: ["id"]
           },
         ]
@@ -1107,6 +1634,7 @@ export type Database = {
           oldest_signature: string | null
           ownership_verified: boolean
           profile_id: string
+          public_contribute: boolean
           sync_error: string | null
           sync_started_at: string | null
           sync_status: string
@@ -1135,6 +1663,7 @@ export type Database = {
           oldest_signature?: string | null
           ownership_verified?: boolean
           profile_id: string
+          public_contribute?: boolean
           sync_error?: string | null
           sync_started_at?: string | null
           sync_status?: string
@@ -1163,6 +1692,7 @@ export type Database = {
           oldest_signature?: string | null
           ownership_verified?: boolean
           profile_id?: string
+          public_contribute?: boolean
           sync_error?: string | null
           sync_started_at?: string | null
           sync_status?: string
@@ -1180,12 +1710,187 @@ export type Database = {
           },
         ]
       }
+      watchlist_items: {
+        Row: {
+          chain: string | null
+          created_at: string
+          id: string
+          item_type: string
+          profile_id: string | null
+          token_address: string | null
+          wallet_id: string | null
+          watchlist_id: string
+        }
+        Insert: {
+          chain?: string | null
+          created_at?: string
+          id?: string
+          item_type: string
+          profile_id?: string | null
+          token_address?: string | null
+          wallet_id?: string | null
+          watchlist_id: string
+        }
+        Update: {
+          chain?: string | null
+          created_at?: string
+          id?: string
+          item_type?: string
+          profile_id?: string | null
+          token_address?: string | null
+          wallet_id?: string | null
+          watchlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchlist_items_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "watchlist_items_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "watchlist_items_watchlist_id_fkey"
+            columns: ["watchlist_id"]
+            isOneToOne: false
+            referencedRelation: "watchlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      watchlists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watchlists_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_jobs: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          lease_expires_at: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          payload: Json
+          run_after: string
+          status: string
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          lease_expires_at?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
+          payload?: Json
+          run_after?: string
+          status?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          lease_expires_at?: string | null
+          locked_at?: string | null
+          locked_by?: string | null
+          max_attempts?: number
+          payload?: Json
+          run_after?: string
+          status?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_jobs_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       check_username: { Args: { _u: string }; Returns: string }
+      claim_worker_job: {
+        Args: { p_lease_seconds?: number; p_worker_id: string }
+        Returns: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          kind: string
+          last_error: string | null
+          lease_expires_at: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          payload: Json
+          run_after: string
+          status: string
+          updated_at: string
+          wallet_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "worker_jobs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_reserved_username: { Args: { _u: string }; Returns: boolean }
     }
     Enums: {
