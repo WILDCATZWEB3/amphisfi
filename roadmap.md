@@ -1,0 +1,2 @@
+- [ ] Audit existing user-facing features, routes, database migration state, and runtime signals; fix reproducible failures only.
+- [ ] Re-test affected flows and report verified results plus any provider/configuration blockers.
